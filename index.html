@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>NRL 2017–2021 — Basic Visualisations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="https://unpkg.com/purecss@3.0.0/build/pure-min.css" />
+<script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
+<style>
+  body {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    color: #1a1a1a;
+    background: #fafafa;
+    margin: 0;
+    padding: 2rem 1rem 4rem 1rem;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header {
+    border-bottom: 2px solid #222;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+  h1 { margin: 0 0 .25rem 0; font-weight: 700; letter-spacing: -.5px; }
+  h2 {
+    margin-top: 2.5rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: .25rem;
+  }
+  .sub { color: #555; font-size: .95rem; }
+  .chart {
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+  .chart canvas, .chart svg { display: block; max-width: 100%; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+  .note {
+    color: #555;
+    font-size: .9rem;
+    margin-top: .25rem;
+  }
+  footer {
+    margin-top: 3rem;
+    color: #777;
+    font-size: .85rem;
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>NRL 2017–2021</h1>
+  <p class="sub">Basic exploratory visualisations of National Rugby League regular-season and finals matches. Data: <code>archive/nrldata.csv</code> (973 matches).</p>
+</header>
+
+<h2>1. Total wins per team</h2>
+<p class="note">Counts every match where the team's score exceeded their opponent's. Draws excluded.</p>
+<div class="chart" id="chart1"></div>
+
+<h2>2. Wins per team per season</h2>
+<p class="note">Heatmap shows how each team's win count shifted across the five seasons.</p>
+<div class="chart" id="chart2"></div>
+
+<h2>3. Home vs away wins</h2>
+<p class="note">Stacked bars splitting wins by venue type.</p>
+<div class="chart" id="chart3"></div>
+
+<h2>4. Points scored vs points conceded</h2>
+<p class="note">A team in the lower-right scores a lot but also lets a lot in; upper-left is the defensive end.</p>
+<div class="chart" id="chart4"></div>
+
+<h2>5. Match-score distribution</h2>
+<p class="note">Histogram of every team-score across all matches (home and away pooled).</p>
+<div class="chart" id="chart5"></div>
+
+<h2>6. Average winning margin per season</h2>
+<p class="note">Margin = |home score − away score|. Tracks how lopsided games have been over time.</p>
+<div class="chart" id="chart6"></div>
+
+<h2>7. Matches by region (map view)</h2>
+<p class="note">Where matches were played. Most NRL games sit in NSW and QLD; 2020–2021 saw a Queensland surge due to COVID relocations.</p>
+<div class="chart" id="chart7"></div>
+
+<h2>8. Top 15 venues by matches hosted</h2>
+<div class="chart" id="chart8"></div>
+
+<h2>9. Head-to-head matchup heatmap</h2>
+<p class="note">Rows = home team, columns = away team, colour = number of matches played.</p>
+<div class="chart" id="chart9"></div>
+
+<h2>10. Match scoring by round</h2>
+<p class="note">Average combined points (home + away) per round number, by season.</p>
+<div class="chart" id="chart10"></div>
+
+<footer>
+  Built with Vega-Lite. Data covers NRL seasons 2017–2021. Charts are intentionally basic for early exploration —
+  the final assignment will need 10 polished, annotated charts plus a proper choropleth map and a second data source.
+</footer>
+</div>
+
+<script>
+const DATA_URL = "archive/nrldata.csv";
+const TEAM_COLORS = {
+  scheme: "tableau20"
+};
+
+// Shared CSV format hint so Vega-Lite parses numeric fields correctly
+const csvFormat = {
+  type: "csv",
+  parse: { year: "number", hscore: "number", ascore: "number" }
+};
+
+// 1) Total wins per team
+const spec1 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 380,
+  padding: { left: 5, right: 20, top: 10, bottom: 10 },
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    {
+      calculate: "datum.hscore > datum.ascore ? datum.hteam : (datum.ascore > datum.hscore ? datum.ateam : null)",
+      as: "winner"
+    },
+    { filter: "datum.winner != null" }
+  ],
+  mark: { type: "bar", cornerRadiusEnd: 3 },
+  encoding: {
+    y: { field: "winner", type: "nominal", sort: "-x", title: "Team" },
+    x: { aggregate: "count", title: "Wins (2017–2021)" },
+    color: { field: "winner", type: "nominal", legend: null, scale: TEAM_COLORS },
+    tooltip: [
+      { field: "winner", title: "Team" },
+      { aggregate: "count", title: "Wins" }
+    ]
+  }
+};
+
+// 2) Wins per team per season (heatmap)
+const spec2 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 380,
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    {
+      calculate: "datum.hscore > datum.ascore ? datum.hteam : (datum.ascore > datum.hscore ? datum.ateam : null)",
+      as: "winner"
+    },
+    { filter: "datum.winner != null" }
+  ],
+  mark: { type: "rect", stroke: "#fff", strokeWidth: 1 },
+  encoding: {
+    x: { field: "year", type: "ordinal", title: "Season" },
+    y: { field: "winner", type: "nominal", title: "Team", sort: "-x" },
+    color: {
+      aggregate: "count",
+      title: "Wins",
+      scale: { scheme: "blues" }
+    },
+    tooltip: [
+      { field: "winner", title: "Team" },
+      { field: "year", title: "Season" },
+      { aggregate: "count", title: "Wins" }
+    ]
+  }
+};
+
+// 3) Home vs away wins (stacked bar)
+const spec3 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 380,
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    {
+      calculate: "datum.hscore > datum.ascore ? datum.hteam : (datum.ascore > datum.hscore ? datum.ateam : null)",
+      as: "winner"
+    },
+    { filter: "datum.winner != null" },
+    {
+      calculate: "datum.hscore > datum.ascore ? 'Home' : 'Away'",
+      as: "venue"
+    }
+  ],
+  mark: { type: "bar" },
+  encoding: {
+    y: { field: "winner", type: "nominal", sort: "-x", title: "Team" },
+    x: { aggregate: "count", title: "Wins" },
+    color: {
+      field: "venue",
+      type: "nominal",
+      scale: { domain: ["Home", "Away"], range: ["#1f77b4", "#ff7f0e"] },
+      title: "Won as"
+    },
+    tooltip: [
+      { field: "winner", title: "Team" },
+      { field: "venue" },
+      { aggregate: "count", title: "Wins" }
+    ]
+  }
+};
+
+// 4) Points scored vs conceded (scatter)
+const spec4 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 420,
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    {
+      fold: ["hteam", "ateam"],
+      as: ["side", "team"]
+    },
+    {
+      calculate: "datum.side == 'hteam' ? datum.hscore : datum.ascore",
+      as: "scored"
+    },
+    {
+      calculate: "datum.side == 'hteam' ? datum.ascore : datum.hscore",
+      as: "conceded"
+    },
+    {
+      aggregate: [
+        { op: "sum", field: "scored", as: "totalScored" },
+        { op: "sum", field: "conceded", as: "totalConceded" },
+        { op: "count", as: "games" }
+      ],
+      groupby: ["team"]
+    }
+  ],
+  mark: { type: "circle", size: 220, opacity: 0.85 },
+  encoding: {
+    x: { field: "totalScored", type: "quantitative", title: "Total points scored" },
+    y: { field: "totalConceded", type: "quantitative", title: "Total points conceded" },
+    color: { field: "team", type: "nominal", legend: null, scale: TEAM_COLORS },
+    tooltip: [
+      { field: "team", title: "Team" },
+      { field: "totalScored", title: "Scored" },
+      { field: "totalConceded", title: "Conceded" },
+      { field: "games", title: "Matches" }
+    ]
+  }
+};
+
+// 5) Score distribution (histogram of every team score)
+const spec5 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 320,
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    { fold: ["hscore", "ascore"], as: ["which", "score"] }
+  ],
+  mark: { type: "bar", color: "#1f77b4" },
+  encoding: {
+    x: {
+      field: "score",
+      bin: { step: 4 },
+      title: "Points scored in a match"
+    },
+    y: { aggregate: "count", title: "Number of team-matches" },
+    tooltip: [
+      { field: "score", bin: { step: 4 }, title: "Score range" },
+      { aggregate: "count", title: "Count" }
+    ]
+  }
+};
+
+// 6) Average winning margin per season
+const spec6 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 320,
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    { calculate: "abs(datum.hscore - datum.ascore)", as: "margin" }
+  ],
+  layer: [
+    {
+      mark: { type: "line", point: true, strokeWidth: 3, color: "#d62728" },
+      encoding: {
+        x: { field: "year", type: "ordinal", title: "Season" },
+        y: { aggregate: "mean", field: "margin", title: "Average winning margin (points)" },
+        tooltip: [
+          { field: "year", title: "Season" },
+          { aggregate: "mean", field: "margin", title: "Avg margin", format: ".1f" }
+        ]
+      }
+    }
+  ]
+};
+
+// Region centroids — used by chart 7 (lookup join)
+const REGION_CENTROIDS = {
+  values: [
+    { region: "NSW", lon: 151.21, lat: -33.87 },
+    { region: "QLD", lon: 145.50, lat: -22.50 },
+    { region: "VIC", lon: 144.96, lat: -37.81 },
+    { region: "ACT", lon: 149.13, lat: -35.28 },
+    { region: "NZ",  lon: 174.76, lat: -36.85 }
+  ]
+};
+
+// 7) Map of matches by region (Australia + NZ)
+const spec7 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 500,
+  projection: { type: "mercator", center: [152, -28], scale: 750 },
+  layer: [
+    {
+      data: {
+        url: "https://vega.github.io/vega-datasets/data/world-110m.json",
+        format: { type: "topojson", feature: "countries" }
+      },
+      mark: { type: "geoshape", fill: "#eef2f5", stroke: "#bbb", strokeWidth: 0.5 }
+    },
+    {
+      data: { url: DATA_URL, format: csvFormat },
+      transform: [
+        { aggregate: [{ op: "count", as: "matches" }], groupby: ["region"] },
+        {
+          lookup: "region",
+          from: { data: REGION_CENTROIDS, key: "region", fields: ["lon", "lat"] }
+        }
+      ],
+      mark: { type: "circle", opacity: 0.75, color: "#d62728", stroke: "#7a0e10", strokeWidth: 1 },
+      encoding: {
+        longitude: { field: "lon", type: "quantitative" },
+        latitude: { field: "lat", type: "quantitative" },
+        size: {
+          field: "matches",
+          type: "quantitative",
+          scale: { range: [100, 3000] },
+          title: "Matches hosted",
+          legend: { orient: "top-right" }
+        },
+        tooltip: [
+          { field: "region", title: "Region" },
+          { field: "matches", title: "Matches" }
+        ]
+      }
+    },
+    {
+      data: { url: DATA_URL, format: csvFormat },
+      transform: [
+        { aggregate: [{ op: "count", as: "matches" }], groupby: ["region"] },
+        {
+          lookup: "region",
+          from: { data: REGION_CENTROIDS, key: "region", fields: ["lon", "lat"] }
+        }
+      ],
+      mark: { type: "text", dy: -28, fontWeight: "bold", fontSize: 12, color: "#222" },
+      encoding: {
+        longitude: { field: "lon", type: "quantitative" },
+        latitude: { field: "lat", type: "quantitative" },
+        text: { field: "region" }
+      }
+    },
+    {
+      data: { url: DATA_URL, format: csvFormat },
+      transform: [
+        { aggregate: [{ op: "count", as: "matches" }], groupby: ["region"] },
+        {
+          lookup: "region",
+          from: { data: REGION_CENTROIDS, key: "region", fields: ["lon", "lat"] }
+        }
+      ],
+      mark: { type: "text", dy: 28, fontSize: 11, color: "#444" },
+      encoding: {
+        longitude: { field: "lon", type: "quantitative" },
+        latitude: { field: "lat", type: "quantitative" },
+        text: { field: "matches" }
+      }
+    }
+  ]
+};
+
+// 8) Top 15 venues by matches hosted
+const spec8 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 380,
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    { aggregate: [{ op: "count", as: "matches" }], groupby: ["location", "region"] },
+    { window: [{ op: "rank", as: "rank" }], sort: [{ field: "matches", order: "descending" }] },
+    { filter: "datum.rank <= 15" }
+  ],
+  mark: { type: "bar" },
+  encoding: {
+    y: { field: "location", type: "nominal", sort: "-x", title: "Venue" },
+    x: { field: "matches", type: "quantitative", title: "Matches hosted" },
+    color: { field: "region", type: "nominal", title: "Region" },
+    tooltip: [
+      { field: "location", title: "Venue" },
+      { field: "region", title: "Region" },
+      { field: "matches", title: "Matches" }
+    ]
+  }
+};
+
+// 9) Head-to-head matchup heatmap
+const spec9 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 480,
+  data: { url: DATA_URL, format: csvFormat },
+  mark: { type: "rect", stroke: "#fff" },
+  encoding: {
+    x: { field: "ateam", type: "nominal", title: "Away team", axis: { labelAngle: -45 } },
+    y: { field: "hteam", type: "nominal", title: "Home team" },
+    color: {
+      aggregate: "count",
+      title: "Matches",
+      scale: { scheme: "greens" }
+    },
+    tooltip: [
+      { field: "hteam", title: "Home" },
+      { field: "ateam", title: "Away" },
+      { aggregate: "count", title: "Matches" }
+    ]
+  }
+};
+
+// 10) Average combined score per round, faceted by season
+const spec10 = {
+  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+  width: 1000,
+  height: 320,
+  data: { url: DATA_URL, format: csvFormat },
+  transform: [
+    { calculate: "datum.hscore + datum.ascore", as: "combined" },
+    { filter: "isNumber(toNumber(datum.round))" },
+    { calculate: "toNumber(datum.round)", as: "roundNum" }
+  ],
+  mark: { type: "line", point: true, interpolate: "monotone" },
+  encoding: {
+    x: { field: "roundNum", type: "quantitative", title: "Round" },
+    y: { aggregate: "mean", field: "combined", title: "Avg combined points / match" },
+    color: { field: "year", type: "ordinal", title: "Season", scale: { scheme: "viridis" } },
+    tooltip: [
+      { field: "year", title: "Season" },
+      { field: "roundNum", title: "Round" },
+      { aggregate: "mean", field: "combined", title: "Avg combined", format: ".1f" }
+    ]
+  }
+};
+
+const opts = { actions: false, renderer: "canvas" };
+const charts = [
+  ["#chart1", spec1], ["#chart2", spec2], ["#chart3", spec3],
+  ["#chart4", spec4], ["#chart5", spec5], ["#chart6", spec6],
+  ["#chart7", spec7], ["#chart8", spec8], ["#chart9", spec9],
+  ["#chart10", spec10]
+];
+charts.forEach(([sel, spec]) => vegaEmbed(sel, spec, opts).catch(console.error));
+</script>
+</body>
+</html>
