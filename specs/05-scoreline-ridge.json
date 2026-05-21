@@ -1,0 +1,141 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Ridgeline density of match scores, faceted by 5-year era — shows how the distribution of points scored has shifted from 1998 to 2025.",
+  "width": 1000,
+  "height": 360,
+  "data": {
+    "url": "../datasets/match_data.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "date": "date",
+        "home_team_score": "number",
+        "away_team_score": "number",
+        "crowd": "number"
+      }
+    }
+  },
+  "transform": [
+    {
+      "filter": "datum.competition == 'NRL'"
+    },
+    {
+      "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.home_team == 'St George Dragons' ? 'St George' :datum.home_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :datum.home_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.home_team == 'Balmain Tigers' ? 'Balmain' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' :datum.home_team == 'North Sydney Bears' ? 'North Sydney' :datum.home_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.home_team == 'Northern Eagles' ? 'Northern Eagles' :datum.home_team",
+      "as": "home"
+    },
+    {
+      "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.away_team == 'St George Dragons' ? 'St George' :datum.away_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :datum.away_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.away_team == 'Balmain Tigers' ? 'Balmain' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' :datum.away_team == 'North Sydney Bears' ? 'North Sydney' :datum.away_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.away_team == 'Northern Eagles' ? 'Northern Eagles' :datum.away_team",
+      "as": "away"
+    },
+    {
+      "calculate": "year(datum.date)",
+      "as": "season"
+    },
+    {
+      "fold": [
+        "home_team_score",
+        "away_team_score"
+      ],
+      "as": [
+        "which",
+        "score"
+      ]
+    },
+    {
+      "calculate": "datum.season < 2003 ? '1998–2002' :datum.season < 2008 ? '2003–2007' :datum.season < 2013 ? '2008–2012' :datum.season < 2018 ? '2013–2017' :datum.season < 2023 ? '2018–2022' : '2023–2025'",
+      "as": "era"
+    },
+    {
+      "density": "score",
+      "groupby": [
+        "era"
+      ],
+      "extent": [
+        0,
+        70
+      ],
+      "steps": 60,
+      "as": [
+        "score_val",
+        "density"
+      ]
+    }
+  ],
+  "facet": {
+    "row": {
+      "field": "era",
+      "type": "ordinal",
+      "title": null,
+      "sort": [
+        "1998–2002",
+        "2003–2007",
+        "2008–2012",
+        "2013–2017",
+        "2018–2022",
+        "2023–2025"
+      ],
+      "header": {
+        "labelAngle": 0,
+        "labelAlign": "left",
+        "labelFontSize": 12,
+        "labelFontWeight": 600,
+        "labelPadding": 8
+      }
+    }
+  },
+  "spec": {
+    "width": 980,
+    "height": 55,
+    "mark": {
+      "type": "area",
+      "interpolate": "monotone",
+      "opacity": 0.75,
+      "color": "#006633",
+      "stroke": "#003d1f",
+      "strokeWidth": 1
+    },
+    "encoding": {
+      "x": {
+        "field": "score_val",
+        "type": "quantitative",
+        "title": "Points scored in a match",
+        "scale": {
+          "domain": [
+            0,
+            70
+          ]
+        },
+        "axis": {
+          "grid": false
+        }
+      },
+      "y": {
+        "field": "density",
+        "type": "quantitative",
+        "axis": null,
+        "scale": {
+          "range": [
+            50,
+            0
+          ]
+        }
+      },
+      "tooltip": [
+        {
+          "field": "era",
+          "title": "Era"
+        },
+        {
+          "field": "score_val",
+          "title": "Score",
+          "format": ".0f"
+        }
+      ]
+    }
+  },
+  "config": {
+    "view": {
+      "stroke": null
+    }
+  }
+}

@@ -1,0 +1,29 @@
+team,full_name,founded,end,active,premierships,home_region,home_city,home_lat,home_lon,colour
+Rabbitohs,South Sydney Rabbitohs,1908,2025,1,21,NSW,Sydney,-33.89,151.21,#017A33
+Roosters,Sydney Roosters,1908,2025,1,15,NSW,Sydney,-33.89,151.23,#001F5C
+Sea Eagles,Manly-Warringah Sea Eagles,1947,2025,1,8,NSW,Sydney,-33.79,151.28,#6F1A47
+Bulldogs,Canterbury-Bankstown Bulldogs,1935,2025,1,8,NSW,Sydney,-33.92,151.09,#003B70
+Broncos,Brisbane Broncos,1988,2025,1,6,QLD,Brisbane,-27.47,153.03,#860038
+Panthers,Penrith Panthers,1967,2025,1,6,NSW,Penrith,-33.75,150.69,#000000
+Eels,Parramatta Eels,1947,2025,1,4,NSW,Parramatta,-33.81,151.00,#FFD700
+Storm,Melbourne Storm,1998,2025,1,4,VIC,Melbourne,-37.83,144.98,#582C83
+Raiders,Canberra Raiders,1982,2025,1,3,ACT,Canberra,-35.28,149.13,#00A859
+Knights,Newcastle Knights,1988,2025,1,2,NSW,Newcastle,-32.92,151.78,#E81E2C
+Cowboys,North Queensland Cowboys,1995,2025,1,1,QLD,Townsville,-19.27,146.82,#1F3160
+Dragons,St George Illawarra Dragons,1999,2025,1,1,NSW,Sydney,-33.97,151.13,#E62631
+Sharks,Cronulla-Sutherland Sharks,1967,2025,1,1,NSW,Sydney,-34.05,151.16,#00BCDC
+Wests Tigers,Wests Tigers,2000,2025,1,1,NSW,Sydney,-33.87,151.21,#FF7F00
+Warriors,New Zealand Warriors,1995,2025,1,0,NZ,Auckland,-36.85,174.76,#0F4C81
+Titans,Gold Coast Titans,2007,2025,1,0,QLD,Gold Coast,-28.00,153.43,#FFB81C
+Dolphins,Redcliffe Dolphins,2023,2025,1,0,QLD,Redcliffe,-27.23,153.11,#A50E2C
+Western Suburbs,Western Suburbs Magpies,1908,1999,0,4,NSW,Sydney,-33.88,151.07,#222222
+Balmain,Balmain Tigers,1908,1999,0,11,NSW,Sydney,-33.86,151.18,#FF6600
+St George,St George Dragons,1921,1998,0,15,NSW,Sydney,-33.97,151.13,#C8102E
+Illawarra,Illawarra Steelers,1982,1998,0,0,NSW,Wollongong,-34.43,150.89,#A30000
+North Sydney,North Sydney Bears,1908,1999,0,5,NSW,Sydney,-33.84,151.21,#D2002E
+Northern Eagles,Northern Eagles,2000,2002,0,0,NSW,Sydney,-33.79,151.28,#002F87
+Gold Coast Chargers,Gold Coast Chargers,1988,1998,0,0,QLD,Gold Coast,-28.00,153.43,#FFB81C
+South Queensland,South Queensland Crushers,1995,1997,0,0,QLD,Brisbane,-27.47,153.03,#660066
+Western Reds,Western Reds,1995,1997,0,0,WA,Perth,-31.95,115.86,#A30000
+Hunter Mariners,Hunter Mariners,1997,1997,0,0,NSW,Newcastle,-32.92,151.78,#005DA8
+Adelaide Rams,Adelaide Rams,1997,1998,0,0,SA,Adelaide,-34.93,138.60,#E55B13

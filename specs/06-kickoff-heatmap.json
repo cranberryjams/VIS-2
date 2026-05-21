@@ -1,0 +1,101 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Heatmap of NRL kickoff times: rows are day of week, columns are kickoff hour (24h), colour is match count.",
+  "width": 880,
+  "height": 260,
+  "data": {
+    "url": "../datasets/match_data.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "date": "date",
+        "home_team_score": "number",
+        "away_team_score": "number",
+        "crowd": "number"
+      }
+    }
+  },
+  "transform": [
+    {
+      "filter": "datum.competition == 'NRL'"
+    },
+    {
+      "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.home_team == 'St George Dragons' ? 'St George' :datum.home_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :datum.home_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.home_team == 'Balmain Tigers' ? 'Balmain' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' :datum.home_team == 'North Sydney Bears' ? 'North Sydney' :datum.home_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.home_team == 'Northern Eagles' ? 'Northern Eagles' :datum.home_team",
+      "as": "home"
+    },
+    {
+      "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.away_team == 'St George Dragons' ? 'St George' :datum.away_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :datum.away_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.away_team == 'Balmain Tigers' ? 'Balmain' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' :datum.away_team == 'North Sydney Bears' ? 'North Sydney' :datum.away_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.away_team == 'Northern Eagles' ? 'Northern Eagles' :datum.away_team",
+      "as": "away"
+    },
+    {
+      "calculate": "year(datum.date)",
+      "as": "season"
+    },
+    {
+      "calculate": "day(datum.date)",
+      "as": "dow_num"
+    },
+    {
+      "calculate": "['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][datum.dow_num]",
+      "as": "dow"
+    },
+    {
+      "calculate": "toNumber(slice(datum.time_24hr, 0, 2))",
+      "as": "hour"
+    },
+    {
+      "filter": "datum.hour != null && datum.hour > 0"
+    }
+  ],
+  "mark": {
+    "type": "rect",
+    "stroke": "#fbf8f3",
+    "strokeWidth": 1
+  },
+  "encoding": {
+    "x": {
+      "field": "hour",
+      "type": "ordinal",
+      "title": "Kickoff hour (24h)",
+      "sort": "ascending"
+    },
+    "y": {
+      "field": "dow",
+      "type": "ordinal",
+      "title": "Day",
+      "sort": [
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed"
+      ]
+    },
+    "color": {
+      "aggregate": "count",
+      "title": "Matches",
+      "scale": {
+        "scheme": "greens"
+      },
+      "legend": {
+        "orient": "right"
+      }
+    },
+    "tooltip": [
+      {
+        "field": "dow",
+        "title": "Day"
+      },
+      {
+        "field": "hour",
+        "title": "Hour"
+      },
+      {
+        "aggregate": "count",
+        "title": "Matches"
+      }
+    ]
+  }
+}

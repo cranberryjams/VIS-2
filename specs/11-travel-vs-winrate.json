@@ -1,0 +1,292 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Scatter of interstate trips made against win rate per active club. Derived in-spec: per-team games, wins, and interstate trips.",
+  "width": 460,
+  "height": 460,
+  "data": {
+    "url": "../datasets/match_data.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "date": "date",
+        "home_team_score": "number",
+        "away_team_score": "number",
+        "crowd": "number"
+      }
+    }
+  },
+  "transform": [
+    {
+      "filter": "datum.competition == 'NRL'"
+    },
+    {
+      "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.home_team == 'St George Dragons' ? 'St George' :datum.home_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :datum.home_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.home_team == 'Balmain Tigers' ? 'Balmain' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' :datum.home_team == 'North Sydney Bears' ? 'North Sydney' :datum.home_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.home_team == 'Northern Eagles' ? 'Northern Eagles' :datum.home_team",
+      "as": "home"
+    },
+    {
+      "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.away_team == 'St George Dragons' ? 'St George' :datum.away_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :datum.away_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.away_team == 'Balmain Tigers' ? 'Balmain' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' :datum.away_team == 'North Sydney Bears' ? 'North Sydney' :datum.away_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.away_team == 'Northern Eagles' ? 'Northern Eagles' :datum.away_team",
+      "as": "away"
+    },
+    {
+      "calculate": "year(datum.date)",
+      "as": "season"
+    },
+    {
+      "filter": {
+        "field": "home",
+        "oneOf": [
+          "Broncos",
+          "Bulldogs",
+          "Cowboys",
+          "Dolphins",
+          "Dragons",
+          "Eels",
+          "Knights",
+          "Panthers",
+          "Rabbitohs",
+          "Raiders",
+          "Roosters",
+          "Sea Eagles",
+          "Sharks",
+          "Storm",
+          "Titans",
+          "Warriors",
+          "Wests Tigers"
+        ]
+      }
+    },
+    {
+      "filter": {
+        "field": "away",
+        "oneOf": [
+          "Broncos",
+          "Bulldogs",
+          "Cowboys",
+          "Dolphins",
+          "Dragons",
+          "Eels",
+          "Knights",
+          "Panthers",
+          "Rabbitohs",
+          "Raiders",
+          "Roosters",
+          "Sea Eagles",
+          "Sharks",
+          "Storm",
+          "Titans",
+          "Warriors",
+          "Wests Tigers"
+        ]
+      }
+    },
+    {
+      "lookup": "home",
+      "from": {
+        "data": {
+          "url": "../datasets/teams.csv",
+          "format": {
+            "type": "csv",
+            "parse": {
+              "founded": "number",
+              "end": "number",
+              "active": "number",
+              "premierships": "number",
+              "home_lat": "number",
+              "home_lon": "number"
+            }
+          }
+        },
+        "key": "team",
+        "fields": [
+          "home_region"
+        ]
+      },
+      "as": [
+        "home_region"
+      ]
+    },
+    {
+      "lookup": "away",
+      "from": {
+        "data": {
+          "url": "../datasets/teams.csv",
+          "format": {
+            "type": "csv",
+            "parse": {
+              "founded": "number",
+              "end": "number",
+              "active": "number",
+              "premierships": "number",
+              "home_lat": "number",
+              "home_lon": "number"
+            }
+          }
+        },
+        "key": "team",
+        "fields": [
+          "home_region"
+        ]
+      },
+      "as": [
+        "away_region"
+      ]
+    },
+    {
+      "fold": [
+        "home",
+        "away"
+      ],
+      "as": [
+        "side",
+        "team"
+      ]
+    },
+    {
+      "calculate": "datum.side == 'home' ? datum.home_team_score : datum.away_team_score",
+      "as": "scored"
+    },
+    {
+      "calculate": "datum.side == 'home' ? datum.away_team_score : datum.home_team_score",
+      "as": "conceded"
+    },
+    {
+      "calculate": "datum.scored > datum.conceded ? 1 : 0",
+      "as": "win"
+    },
+    {
+      "calculate": "datum.side == 'away' && datum.home_region != null && datum.away_region != null && datum.home_region != datum.away_region ? 1 : 0",
+      "as": "trip"
+    },
+    {
+      "aggregate": [
+        {
+          "op": "sum",
+          "field": "win",
+          "as": "wins"
+        },
+        {
+          "op": "count",
+          "as": "games"
+        },
+        {
+          "op": "sum",
+          "field": "trip",
+          "as": "trips"
+        }
+      ],
+      "groupby": [
+        "team"
+      ]
+    },
+    {
+      "lookup": "team",
+      "from": {
+        "data": {
+          "url": "../datasets/teams.csv",
+          "format": {
+            "type": "csv",
+            "parse": {
+              "founded": "number",
+              "end": "number",
+              "active": "number",
+              "premierships": "number",
+              "home_lat": "number",
+              "home_lon": "number"
+            }
+          }
+        },
+        "key": "team",
+        "fields": [
+          "colour"
+        ]
+      }
+    },
+    {
+      "calculate": "datum.wins / datum.games",
+      "as": "wr"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "circle",
+        "size": 260,
+        "opacity": 0.85,
+        "stroke": "#14181d",
+        "strokeWidth": 0.75
+      },
+      "encoding": {
+        "x": {
+          "field": "trips",
+          "type": "quantitative",
+          "title": "Interstate trips made"
+        },
+        "y": {
+          "field": "wr",
+          "type": "quantitative",
+          "title": "Win rate",
+          "axis": {
+            "format": ".0%"
+          },
+          "scale": {
+            "domain": [
+              0.2,
+              0.7
+            ]
+          }
+        },
+        "color": {
+          "field": "colour",
+          "type": "nominal",
+          "scale": null,
+          "legend": null
+        },
+        "tooltip": [
+          {
+            "field": "team",
+            "title": "Club"
+          },
+          {
+            "field": "games",
+            "title": "Games"
+          },
+          {
+            "field": "wins",
+            "title": "Wins"
+          },
+          {
+            "field": "wr",
+            "title": "Win-rate",
+            "format": ".0%"
+          },
+          {
+            "field": "trips",
+            "title": "Interstate trips"
+          }
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontSize": 10,
+        "color": "#14181d",
+        "fontWeight": 600
+      },
+      "encoding": {
+        "x": {
+          "field": "trips",
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "wr",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "team"
+        }
+      }
+    }
+  ]
+}

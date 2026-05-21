@@ -1,0 +1,269 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Where the league is played: club home grounds across Australia and New Zealand, sized by number of home matches played 1998–2025.",
+  "width": 1000,
+  "height": 540,
+  "projection": {
+    "type": "mercator",
+    "center": [
+      149,
+      -29
+    ],
+    "scale": 700
+  },
+  "layer": [
+    {
+      "data": {
+        "url": "https://vega.github.io/vega-datasets/data/world-110m.json",
+        "format": {
+          "type": "topojson",
+          "feature": "countries"
+        }
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#efe9dc",
+        "stroke": "#cfc6b1",
+        "strokeWidth": 0.7
+      }
+    },
+    {
+      "data": {
+        "url": "../datasets/match_data.csv",
+        "format": {
+          "type": "csv",
+          "parse": {
+            "date": "date",
+            "home_team_score": "number",
+            "away_team_score": "number",
+            "crowd": "number"
+          }
+        }
+      },
+      "transform": [
+        {
+          "filter": "datum.competition == 'NRL'"
+        },
+        {
+          "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.home_team == 'St George Dragons' ? 'St George' :datum.home_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :datum.home_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.home_team == 'Balmain Tigers' ? 'Balmain' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' :datum.home_team == 'North Sydney Bears' ? 'North Sydney' :datum.home_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.home_team == 'Northern Eagles' ? 'Northern Eagles' :datum.home_team",
+          "as": "home"
+        },
+        {
+          "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.away_team == 'St George Dragons' ? 'St George' :datum.away_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :datum.away_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.away_team == 'Balmain Tigers' ? 'Balmain' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' :datum.away_team == 'North Sydney Bears' ? 'North Sydney' :datum.away_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.away_team == 'Northern Eagles' ? 'Northern Eagles' :datum.away_team",
+          "as": "away"
+        },
+        {
+          "calculate": "year(datum.date)",
+          "as": "season"
+        },
+        {
+          "aggregate": [
+            {
+              "op": "count",
+              "as": "home_matches"
+            }
+          ],
+          "groupby": [
+            "home"
+          ]
+        },
+        {
+          "lookup": "home",
+          "from": {
+            "data": {
+              "url": "../datasets/teams.csv",
+              "format": {
+                "type": "csv",
+                "parse": {
+                  "founded": "number",
+                  "end": "number",
+                  "active": "number",
+                  "premierships": "number",
+                  "home_lat": "number",
+                  "home_lon": "number"
+                }
+              }
+            },
+            "key": "team",
+            "fields": [
+              "home_lat",
+              "home_lon",
+              "home_city",
+              "home_region",
+              "full_name"
+            ]
+          }
+        },
+        {
+          "filter": "datum.home_lat != null"
+        }
+      ],
+      "mark": {
+        "type": "circle",
+        "opacity": 0.8,
+        "stroke": "#003d1f",
+        "strokeWidth": 1
+      },
+      "encoding": {
+        "longitude": {
+          "field": "home_lon",
+          "type": "quantitative"
+        },
+        "latitude": {
+          "field": "home_lat",
+          "type": "quantitative"
+        },
+        "size": {
+          "field": "home_matches",
+          "type": "quantitative",
+          "scale": {
+            "range": [
+              50,
+              1600
+            ]
+          },
+          "title": "Home matches",
+          "legend": {
+            "orient": "top-right"
+          }
+        },
+        "color": {
+          "field": "home_region",
+          "type": "nominal",
+          "title": "Region",
+          "scale": {
+            "domain": [
+              "NSW",
+              "QLD",
+              "VIC",
+              "ACT",
+              "NZ",
+              "SA",
+              "WA"
+            ],
+            "range": [
+              "#006633",
+              "#c8a14a",
+              "#582C83",
+              "#1B7B7A",
+              "#0F4C81",
+              "#E55B13",
+              "#A30000"
+            ]
+          },
+          "legend": {
+            "orient": "top-right"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "full_name",
+            "title": "Club"
+          },
+          {
+            "field": "home_city",
+            "title": "Home city"
+          },
+          {
+            "field": "home_region",
+            "title": "Region"
+          },
+          {
+            "field": "home_matches",
+            "title": "Home matches"
+          }
+        ]
+      }
+    },
+    {
+      "data": {
+        "url": "../datasets/match_data.csv",
+        "format": {
+          "type": "csv",
+          "parse": {
+            "date": "date",
+            "home_team_score": "number",
+            "away_team_score": "number",
+            "crowd": "number"
+          }
+        }
+      },
+      "transform": [
+        {
+          "filter": "datum.competition == 'NRL'"
+        },
+        {
+          "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.home_team == 'St George Dragons' ? 'St George' :datum.home_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :datum.home_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.home_team == 'Balmain Tigers' ? 'Balmain' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' :datum.home_team == 'North Sydney Bears' ? 'North Sydney' :datum.home_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.home_team == 'Northern Eagles' ? 'Northern Eagles' :datum.home_team",
+          "as": "home"
+        },
+        {
+          "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.away_team == 'St George Dragons' ? 'St George' :datum.away_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :datum.away_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.away_team == 'Balmain Tigers' ? 'Balmain' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' :datum.away_team == 'North Sydney Bears' ? 'North Sydney' :datum.away_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.away_team == 'Northern Eagles' ? 'Northern Eagles' :datum.away_team",
+          "as": "away"
+        },
+        {
+          "calculate": "year(datum.date)",
+          "as": "season"
+        },
+        {
+          "aggregate": [
+            {
+              "op": "count",
+              "as": "home_matches"
+            }
+          ],
+          "groupby": [
+            "home"
+          ]
+        },
+        {
+          "lookup": "home",
+          "from": {
+            "data": {
+              "url": "../datasets/teams.csv",
+              "format": {
+                "type": "csv",
+                "parse": {
+                  "founded": "number",
+                  "end": "number",
+                  "active": "number",
+                  "premierships": "number",
+                  "home_lat": "number",
+                  "home_lon": "number"
+                }
+              }
+            },
+            "key": "team",
+            "fields": [
+              "home_lat",
+              "home_lon",
+              "home_city"
+            ]
+          }
+        },
+        {
+          "filter": "datum.home_lat != null && datum.home_matches >= 100"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "dy": -16,
+        "fontWeight": 600,
+        "fontSize": 11,
+        "color": "#14181d"
+      },
+      "encoding": {
+        "longitude": {
+          "field": "home_lon",
+          "type": "quantitative"
+        },
+        "latitude": {
+          "field": "home_lat",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "home_city"
+        }
+      }
+    }
+  ]
+}

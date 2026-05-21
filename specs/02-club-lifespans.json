@@ -1,0 +1,148 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Club lifespans 1990–2025: Gantt-style bar per club, coloured by whether the club is still in the NRL. End-of-bar labels show premiership counts.",
+  "width": 1000,
+  "height": 560,
+  "data": {
+    "url": "../datasets/teams.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "founded": "number",
+        "end": "number",
+        "active": "number",
+        "premierships": "number",
+        "home_lat": "number",
+        "home_lon": "number"
+      }
+    }
+  },
+  "transform": [
+    {
+      "calculate": "max(datum.founded, 1990)",
+      "as": "start_v"
+    },
+    {
+      "calculate": "datum.active == 1 ? 'Still in NRL' : 'Disbanded'",
+      "as": "status"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "bar",
+        "height": 14,
+        "cornerRadius": 2
+      },
+      "encoding": {
+        "y": {
+          "field": "team",
+          "type": "nominal",
+          "sort": {
+            "field": "founded",
+            "order": "ascending"
+          },
+          "title": null,
+          "axis": {
+            "labelFontSize": 11,
+            "ticks": false,
+            "domain": false
+          }
+        },
+        "x": {
+          "field": "start_v",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              1990,
+              2025
+            ]
+          },
+          "title": "Year",
+          "axis": {
+            "format": "d",
+            "tickCount": 8,
+            "grid": true,
+            "gridColor": "#e2ecdf"
+          }
+        },
+        "x2": {
+          "field": "end"
+        },
+        "color": {
+          "field": "status",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "Still in NRL",
+              "Disbanded"
+            ],
+            "range": [
+              "#006633",
+              "#8a8578"
+            ]
+          },
+          "title": null,
+          "legend": {
+            "orient": "top-right"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "full_name",
+            "title": "Club"
+          },
+          {
+            "field": "founded",
+            "title": "Founded"
+          },
+          {
+            "field": "end",
+            "title": "Last season"
+          },
+          {
+            "field": "premierships",
+            "title": "Premierships"
+          },
+          {
+            "field": "home_city",
+            "title": "Home"
+          }
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 6,
+        "fontSize": 10,
+        "color": "#4b5460"
+      },
+      "encoding": {
+        "y": {
+          "field": "team",
+          "type": "nominal",
+          "sort": {
+            "field": "founded",
+            "order": "ascending"
+          }
+        },
+        "x": {
+          "field": "end",
+          "type": "quantitative"
+        },
+        "text": {
+          "field": "premierships",
+          "type": "quantitative",
+          "format": "d"
+        }
+      }
+    }
+  ],
+  "config": {
+    "view": {
+      "stroke": null
+    }
+  }
+}
