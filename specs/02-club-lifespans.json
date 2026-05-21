@@ -4,7 +4,7 @@
   "width": 1000,
   "height": 560,
   "data": {
-    "url": "../datasets/teams.csv",
+    "url": "datasets/teams.csv",
     "format": {
       "type": "csv",
       "parse": {

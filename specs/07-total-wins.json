@@ -4,7 +4,7 @@
   "width": 460,
   "height": 380,
   "data": {
-    "url": "../datasets/match_data.csv",
+    "url": "datasets/match_data.csv",
     "format": {
       "type": "csv",
       "parse": {

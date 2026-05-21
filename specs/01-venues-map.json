@@ -29,7 +29,7 @@
     },
     {
       "data": {
-        "url": "../datasets/match_data.csv",
+        "url": "datasets/match_data.csv",
         "format": {
           "type": "csv",
           "parse": {
@@ -71,7 +71,7 @@
           "lookup": "home",
           "from": {
             "data": {
-              "url": "../datasets/teams.csv",
+              "url": "datasets/teams.csv",
               "format": {
                 "type": "csv",
                 "parse": {
@@ -177,7 +177,7 @@
     },
     {
       "data": {
-        "url": "../datasets/match_data.csv",
+        "url": "datasets/match_data.csv",
         "format": {
           "type": "csv",
           "parse": {
@@ -219,7 +219,7 @@
           "lookup": "home",
           "from": {
             "data": {
-              "url": "../datasets/teams.csv",
+              "url": "datasets/teams.csv",
               "format": {
                 "type": "csv",
                 "parse": {

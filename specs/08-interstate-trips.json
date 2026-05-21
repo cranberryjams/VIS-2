@@ -4,7 +4,7 @@
   "width": 460,
   "height": 380,
   "data": {
-    "url": "../datasets/match_data.csv",
+    "url": "datasets/match_data.csv",
     "format": {
       "type": "csv",
       "parse": {
@@ -35,7 +35,7 @@
       "lookup": "home",
       "from": {
         "data": {
-          "url": "../datasets/teams.csv",
+          "url": "datasets/teams.csv",
           "format": {
             "type": "csv",
             "parse": {
@@ -61,7 +61,7 @@
       "lookup": "away",
       "from": {
         "data": {
-          "url": "../datasets/teams.csv",
+          "url": "datasets/teams.csv",
           "format": {
             "type": "csv",
             "parse": {
@@ -112,17 +112,19 @@
         "y": {
           "field": "away",
           "type": "nominal",
-          "sort": "-x",
+          "sort": { "field": "trips", "order": "descending" },
           "title": null,
           "axis": {
             "labelFontSize": 11
           }
         },
         "x": {
-          "value": 0
+          "field": "trips",
+          "type": "quantitative",
+          "title": "Interstate away matches"
         },
         "x2": {
-          "field": "trips"
+          "datum": 0
         }
       }
     },
@@ -138,7 +140,7 @@
         "y": {
           "field": "away",
           "type": "nominal",
-          "sort": "-x"
+          "sort": { "field": "trips", "order": "descending" }
         },
         "x": {
           "field": "trips",

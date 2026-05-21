@@ -2,7 +2,7 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Club fingerprints: five derived metrics per active club (attack, defence, finals games, home win-rate, away win-rate), shown as faceted small-multiple bars normalised to a shared max.",
   "data": {
-    "url": "../datasets/match_data.csv",
+    "url": "datasets/match_data.csv",
     "format": {
       "type": "csv",
       "parse": {

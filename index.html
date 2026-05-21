@@ -2,472 +2,376 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>NRL 2017–2021 — Basic Visualisations</title>
+<title>35 Years of NRL — A Visual Story</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="author" content="James Deng" />
+<meta name="description" content="A data-visualisation essay on 35 years of Australian National Rugby League — venues, evolution, and teams." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+
 <link rel="stylesheet" href="https://unpkg.com/purecss@3.0.0/build/pure-min.css" />
 <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.3"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
+
 <style>
-  body {
-    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
-    color: #1a1a1a;
-    background: #fafafa;
-    margin: 0;
-    padding: 2rem 1rem 4rem 1rem;
-    line-height: 1.5;
+  :root {
+    --ink: #14181d;
+    --ink-soft: #4b5460;
+    --paper: #fbf8f3;
+    --paper-2: #ffffff;
+    --rule: #e3ddd1;
+    --accent: #006633;
+    --accent-dark: #003d1f;
+    --gold: #c8a14a;
+    --muted: #8a8578;
   }
-  .wrap { max-width: 1100px; margin: 0 auto; }
-  header {
-    border-bottom: 2px solid #222;
-    padding-bottom: 1rem;
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper); color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.55; font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem; }
+
+  .masthead {
+    border-bottom: 3px double var(--ink);
+    padding: 2.5rem 0 1.25rem 0;
     margin-bottom: 2rem;
+    text-align: center;
   }
-  h1 { margin: 0 0 .25rem 0; font-weight: 700; letter-spacing: -.5px; }
-  h2 {
-    margin-top: 2.5rem;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: .25rem;
+  .kicker {
+    text-transform: uppercase; letter-spacing: .25em;
+    font-size: .72rem; color: var(--accent); font-weight: 600;
+    margin-bottom: .5rem;
   }
-  .sub { color: #555; font-size: .95rem; }
+  .masthead h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: .95; margin: 0;
+    letter-spacing: .01em; color: var(--ink);
+  }
+  .masthead .deck {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic; font-size: 1.15rem;
+    color: var(--ink-soft);
+    margin: 1rem auto 0; max-width: 720px; line-height: 1.45;
+  }
+  .byline {
+    font-size: .8rem; color: var(--muted);
+    margin-top: 1rem; letter-spacing: .04em; text-transform: uppercase;
+  }
+
+  section { padding: 2rem 0 1rem 0; }
+  .section-head { margin: 3rem 0 1.5rem 0; }
+  .section-head .num {
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--accent); font-size: 1rem;
+    letter-spacing: .3em; display: block; margin-bottom: .35rem;
+  }
+  .section-head h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    margin: 0 0 .5rem 0; line-height: 1; color: var(--ink);
+  }
+  .section-head .lede {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.05rem; color: var(--ink-soft);
+    max-width: 640px; line-height: 1.55;
+  }
+
+  p { margin: 0 0 1rem 0; }
+  .narrative { max-width: 680px; }
+  .narrative p { font-size: 1rem; color: var(--ink); }
+  .narrative p:first-of-type::first-letter {
+    font-family: 'Playfair Display', Georgia, serif;
+    float: left; font-size: 3.6rem; line-height: .85;
+    padding: .25rem .55rem .15rem 0;
+    color: var(--accent); font-weight: 700;
+  }
+
+  h3.chart-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.65rem; letter-spacing: .02em;
+    margin: 2rem 0 .15rem 0; line-height: 1.1;
+  }
+  h3.chart-title .num-badge {
+    display: inline-block;
+    background: var(--ink); color: var(--paper);
+    border-radius: 50%;
+    width: 1.5rem; height: 1.5rem; line-height: 1.55rem;
+    text-align: center; font-size: .85rem;
+    margin-right: .55rem; vertical-align: 4px;
+    font-family: 'Inter', sans-serif; font-weight: 700;
+  }
+  .chart-note {
+    color: var(--ink-soft); font-size: .92rem;
+    margin: 0 0 .75rem 0; max-width: 760px;
+  }
+  .chart-note .em { color: var(--accent); font-weight: 600; }
+
   .chart {
-    background: #fff;
-    border: 1px solid #e3e3e3;
-    border-radius: 6px;
-    padding: 1rem;
-    margin-top: 1rem;
-    box-shadow: 0 1px 2px rgba(0,0,0,.04);
-    width: 100%;
-    box-sizing: border-box;
-    overflow-x: auto;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px; padding: 1rem;
+    margin-top: .75rem; width: 100%; overflow-x: auto;
+    box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 6px 18px -10px rgba(0,0,0,.08);
   }
   .chart canvas, .chart svg { display: block; max-width: 100%; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
-  .note {
-    color: #555;
-    font-size: .9rem;
-    margin-top: .25rem;
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
+  @media (max-width: 820px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .hero-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1rem; margin: 2rem 0;
+    padding: 1.5rem 1rem;
+    background: var(--ink); color: var(--paper);
+    border-radius: 4px;
   }
+  @media (max-width: 720px) { .hero-stats { grid-template-columns: repeat(2, 1fr); } }
+  .hero-stats .stat { text-align: center; padding: 0 .5rem; }
+  .hero-stats .stat .num {
+    display: block; font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1;
+    color: var(--gold);
+  }
+  .hero-stats .stat .label {
+    display: block; text-transform: uppercase;
+    letter-spacing: .18em; font-size: .72rem;
+    margin-top: .35rem; color: rgba(251, 248, 243, .8);
+  }
+  .hero-stats .stat .sub {
+    display: block; font-size: .72rem;
+    color: rgba(251, 248, 243, .55); margin-top: .25rem;
+  }
+
+  .pull {
+    border-left: 4px solid var(--accent);
+    padding: .25rem 0 .25rem 1.25rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic; font-size: 1.2rem;
+    color: var(--ink-soft);
+    margin: 2rem 0; max-width: 640px;
+  }
+
   footer {
-    margin-top: 3rem;
-    color: #777;
-    font-size: .85rem;
-    border-top: 1px solid #ddd;
-    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 4rem; padding: 2rem 0 3rem 0;
+    color: var(--ink-soft); font-size: .88rem;
   }
+  footer h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: .12em; font-size: 1.1rem;
+    color: var(--ink); margin: 0 0 .5rem 0;
+  }
+  footer a { color: var(--accent-dark); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer ul { margin: 0; padding-left: 1.1rem; }
+  footer li { margin-bottom: .35rem; }
+  hr.rule { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0 1rem 0; }
 </style>
 </head>
+
 <body>
 <div class="wrap">
-<header>
-  <h1>NRL 2017–2021</h1>
-  <p class="sub">Basic exploratory visualisations of National Rugby League regular-season and finals matches. Data: <code>archive/nrldata.csv</code> (973 matches).</p>
-</header>
 
-<h2>1. Total wins per team</h2>
-<p class="note">Counts every match where the team's score exceeded their opponent's. Draws excluded.</p>
-<div class="chart" id="chart1"></div>
+  <header class="masthead">
+    <div class="kicker">A Data Visualisation Essay · FIT2179</div>
+    <h1>35 YEARS OF NRL</h1>
+    <p class="deck">A visual story of Australia's National Rugby League — its grounds, its growth, and the clubs that have defined three and a half decades of winter Sundays.</p>
+    <div class="byline">By James Deng · Monash University · May 2026</div>
+  </header>
 
-<h2>2. Wins per team per season</h2>
-<p class="note">Heatmap shows how each team's win count shifted across the five seasons.</p>
-<div class="chart" id="chart2"></div>
+  <!-- ============== SECTION 1 — INTRO ============== -->
+  <section id="intro">
+    <div class="section-head">
+      <span class="num">PART ONE</span>
+      <h2>The Game and Its Grounds</h2>
+      <p class="lede">From the chaos of the 1990s Super League war to a continent-spanning competition in 2025, the NRL has grown into Australia's most-watched winter sport.</p>
+    </div>
 
-<h2>3. Home vs away wins</h2>
-<p class="note">Stacked bars splitting wins by venue type.</p>
-<div class="chart" id="chart3"></div>
+    <div class="narrative">
+      <p>Rugby league has been played in Australia since 1908, but the modern era we recognise today — a national, professional, broadcast-shaped competition — was built over the last thirty-five years. In 1990 the New South Wales Rugby League fielded sixteen mostly-Sydney clubs. In 1998 the NRL was born from the wreckage of the Super League war. By 2025 the league runs seventeen teams across three Australian states, the ACT and New Zealand, with the Dolphins as its newest entry.</p>
+      <p>The story is told here through two data sources: every NRL match played from 1998 to 2025 — over 5,400 games — and a compiled club timeline covering every team that has competed since 1990. Together they let us look at the league from three angles: where it is played, how the game itself has changed, and which clubs have ruled the field.</p>
+    </div>
 
-<h2>4. Points scored vs points conceded</h2>
-<p class="note">A team in the lower-right scores a lot but also lets a lot in; upper-left is the defensive end.</p>
-<div class="chart" id="chart4"></div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="num">5,435</span>
+        <span class="label">NRL matches</span>
+        <span class="sub">1998 – 2025</span>
+      </div>
+      <div class="stat">
+        <span class="num">28</span>
+        <span class="label">Seasons</span>
+        <span class="sub">First in 1998</span>
+      </div>
+      <div class="stat">
+        <span class="num">17</span>
+        <span class="label">Active clubs</span>
+        <span class="sub">2025 season</span>
+      </div>
+      <div class="stat">
+        <span class="num">28</span>
+        <span class="label">Clubs since 1990</span>
+        <span class="sub">11 since disbanded</span>
+      </div>
+    </div>
 
-<h2>5. Match-score distribution</h2>
-<p class="note">Histogram of every team-score across all matches (home and away pooled).</p>
-<div class="chart" id="chart5"></div>
+    <h3 class="chart-title"><span class="num-badge">1</span>Where the league is based</h3>
+    <p class="chart-note">Each circle marks a club's home city, sized by total NRL matches played at that ground (1998–2025). The league's centre of gravity is unmistakably <span class="em">Sydney</span> — eight clubs share the harbour city — with secondary hubs in Brisbane, Newcastle, the Gold Coast, Auckland, and Melbourne.</p>
+    <div class="chart" id="chart-map"></div>
 
-<h2>6. Average winning margin per season</h2>
-<p class="note">Margin = |home score − away score|. Tracks how lopsided games have been over time.</p>
-<div class="chart" id="chart6"></div>
+    <h3 class="chart-title"><span class="num-badge">2</span>Club lifespans, 1990 – 2025</h3>
+    <p class="chart-note">Each bar marks the years a club competed in the top tier of Australian rugby league. The mid-1990s Super League war drove a wave of mergers and exits — <span class="em">eleven clubs</span> have left the competition since 1990, while expansion has added Brisbane, Melbourne, the Gold Coast, North Queensland, New Zealand, and most recently the Dolphins. Numbers beside each bar count first-grade premierships won.</p>
+    <div class="chart" id="chart-lifespan"></div>
 
-<h2>7. Matches by region (map view)</h2>
-<p class="note">Where matches were played. Most NRL games sit in NSW and QLD; 2020–2021 saw a Queensland surge due to COVID relocations.</p>
-<div class="chart" id="chart7"></div>
+    <div class="pull">"A league shaped less by how many teams it adds than by which ones it keeps."</div>
+  </section>
 
-<h2>8. Top 15 venues by matches hosted</h2>
-<div class="chart" id="chart8"></div>
+  <!-- ============== SECTION 2 — EVOLUTION ============== -->
+  <section id="evolution">
+    <div class="section-head">
+      <span class="num">PART TWO</span>
+      <h2>How the Game Has Changed</h2>
+      <p class="lede">Higher scores, faster games, and Friday-night kickoffs designed for prime-time TV — the NRL of 2025 plays a different shape of football to the NRL of 1998.</p>
+    </div>
 
-<h2>9. Head-to-head matchup heatmap</h2>
-<p class="note">Rows = home team, columns = away team, colour = number of matches played.</p>
-<div class="chart" id="chart9"></div>
+    <div class="narrative">
+      <p>Twenty-eight seasons of match data — every game, every score, every kickoff time — let us examine the long-run rhythms of the NRL. The window captures the 1998 unification, the post-2000 expansion, the 2020 COVID-truncated season, and the dynastic Panthers era of the early 2020s. The 2025 figures here are partial; the rest of the seasons are complete.</p>
+    </div>
 
-<h2>10. Match scoring by round</h2>
-<p class="note">Average combined points (home + away) per round number, by season.</p>
-<div class="chart" id="chart10"></div>
+    <div class="grid-2">
+      <div>
+        <h3 class="chart-title"><span class="num-badge">3</span>Points per match by season</h3>
+        <p class="chart-note">Average total points scored per match each year — a measure of how open the game has become.</p>
+        <div class="chart" id="chart-points"></div>
+      </div>
+      <div>
+        <h3 class="chart-title"><span class="num-badge">4</span>Home vs away scoring</h3>
+        <p class="chart-note">Stacked area of average home and away points. Home advantage is steady but slim.</p>
+        <div class="chart" id="chart-homeaway"></div>
+      </div>
+    </div>
 
-<footer>
-  Built with Vega-Lite. Data covers NRL seasons 2017–2021. Charts are intentionally basic for early exploration —
-  the final assignment will need 10 polished, annotated charts plus a proper choropleth map and a second data source.
-</footer>
+    <h3 class="chart-title"><span class="num-badge">5</span>The shape of a scoreline</h3>
+    <p class="chart-note">A ridgeline showing how team-scores distribute across six five-year eras. Most performances land between <span class="em">10 and 30 points</span>, with a long tail of blowouts that has thickened slightly in the modern game.</p>
+    <div class="chart" id="chart-ridge"></div>
+
+    <h3 class="chart-title"><span class="num-badge">6</span>Kickoff times — when the NRL plays</h3>
+    <p class="chart-note">A heatmap of match count by day of week and kickoff hour. Over 28 seasons the broadcast schedule has crystallised three blocks: a <span class="em">Friday night</span> prime-time game, a <span class="em">Saturday afternoon</span> family slot, and a <span class="em">Sunday afternoon</span> closer.</p>
+    <div class="chart" id="chart-daytime"></div>
+  </section>
+
+  <!-- ============== SECTION 3 — TEAMS ============== -->
+  <section id="teams">
+    <div class="section-head">
+      <span class="num">PART THREE</span>
+      <h2>Teams and Their Reign</h2>
+      <p class="lede">Which clubs have dominated, which have travelled the furthest, and how the ladder has shifted from season to season.</p>
+    </div>
+
+    <div class="narrative">
+      <p>A grand final tells you who won the premiership. The story of an NRL era — twenty-eight years of cross-country flights, narrow losses, and head-to-head rivalries — needs more than one chart to tell. The following six visualisations profile the league's clubs over the 1998–2025 window: total wins, travel burden, ladder volatility, head-to-head matchups, the relationship between travel and performance, and an at-a-glance team fingerprint.</p>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <h3 class="chart-title"><span class="num-badge">7</span>Total wins, 1998 – 2025</h3>
+        <p class="chart-note">Foundation clubs Roosters, Storm, and Broncos lead the era. New entrants Titans and Dolphins sit lower simply by having played fewer seasons.</p>
+        <div class="chart" id="chart-wins"></div>
+      </div>
+      <div>
+        <h3 class="chart-title"><span class="num-badge">8</span>Interstate trips made</h3>
+        <p class="chart-note">A lollipop counting the matches each club played outside its home state. The <span class="em">Warriors</span> are an outlier — every road game is a flight across the Tasman.</p>
+        <div class="chart" id="chart-travel"></div>
+      </div>
+    </div>
+
+    <h3 class="chart-title"><span class="num-badge">9</span>Four trajectories, 1998 – 2024</h3>
+    <p class="chart-note">Regular-season ladder finish for the four clubs that define the era. Rank 1 is the minor premiership; rank 16 is the wooden spoon. The <span class="em">Storm</span>'s purple line barely leaves the top four — sustained dominance. The <span class="em">Panthers</span> climb from a decade in mid-table to a modern dynasty. The <span class="em">Knights</span> and <span class="em">Bulldogs</span> sink the other way.</p>
+    <div class="chart" id="chart-bump"></div>
+
+    <div class="grid-2">
+      <div>
+        <h3 class="chart-title"><span class="num-badge">10</span>Head-to-head matrix</h3>
+        <p class="chart-note">Home win-rate by fixture. Darker = the row team won more often at home against the column opponent.</p>
+        <div class="chart" id="chart-h2h"></div>
+      </div>
+      <div>
+        <h3 class="chart-title"><span class="num-badge">11</span>Does travel hurt?</h3>
+        <p class="chart-note">Each dot is a club. Interstate trips on the x-axis, win-rate on the y-axis. Distance does not predict failure.</p>
+        <div class="chart" id="chart-travel-wr"></div>
+      </div>
+    </div>
+
+    <h3 class="chart-title"><span class="num-badge">12</span>Club fingerprints</h3>
+    <p class="chart-note">Five metrics for each currently-active club: attack (avg points scored), defence (avg points conceded, inverted so longer = better), finals games played, home win-rate, and away win-rate. Clubs are ordered by overall win-rate.</p>
+    <div class="chart" id="chart-radar"></div>
+
+    <div class="pull">"There is no formula for a premiership — only patterns. Some clubs win at home, some win on the road, and one or two seem to win wherever the schedule sends them."</div>
+  </section>
+
+  <hr class="rule" />
+  <footer>
+    <div class="grid-2">
+      <div>
+        <h4>About this visualisation</h4>
+        <p>Created by <strong>James Deng</strong> for FIT2179 Data Visualisation, Monash University, Semester 1 2026. All twelve charts were built using <a href="https://vega.github.io/vega-lite/">Vega-Lite</a>; layout uses <a href="https://purecss.io/">Pure.css</a>. Typography pairs <em>Bebas Neue</em>, <em>Playfair Display</em>, and <em>Inter</em>.</p>
+        <p>Vega-Lite JSON specifications for every chart are inlined in the source of this page (<code>index.html</code>) and are available in the GitHub repository.</p>
+      </div>
+      <div>
+        <h4>Data sources</h4>
+        <ul>
+          <li>Historical Australian rugby league match results — <code>datasets/match_data.csv</code>, filtered here to the NRL competition only (1998–2025, 5,435 matches). Sourced from public NRL fixture data on Kaggle.</li>
+          <li>Club timeline and metadata — <code>datasets/teams.csv</code>, compiled from public Wikipedia pages for each NRL/ARL/NSWRFL club active between 1990 and 2025.</li>
+          <li>World coastlines for the map — <a href="https://github.com/vega/vega-datasets">vega-datasets / world-110m</a>.</li>
+        </ul>
+        <h4 style="margin-top:1rem;">AI use</h4>
+        <p>Anthropic Claude was used to assist with HTML/CSS layout and Vega-Lite spec drafting. All data was sourced from the public datasets listed above; no chart data was generated.</p>
+      </div>
+    </div>
+  </footer>
+
 </div>
 
 <script>
-const DATA_URL = "archive/nrldata.csv";
-const TEAM_COLORS = {
-  scheme: "tableau20"
-};
-
-// Shared CSV format hint so Vega-Lite parses numeric fields correctly
-const csvFormat = {
-  type: "csv",
-  parse: { year: "number", hscore: "number", ascore: "number" }
-};
-
-// 1) Total wins per team
-const spec1 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 380,
-  padding: { left: 5, right: 20, top: 10, bottom: 10 },
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    {
-      calculate: "datum.hscore > datum.ascore ? datum.hteam : (datum.ascore > datum.hscore ? datum.ateam : null)",
-      as: "winner"
-    },
-    { filter: "datum.winner != null" }
-  ],
-  mark: { type: "bar", cornerRadiusEnd: 3 },
-  encoding: {
-    y: { field: "winner", type: "nominal", sort: "-x", title: "Team" },
-    x: { aggregate: "count", title: "Wins (2017–2021)" },
-    color: { field: "winner", type: "nominal", legend: null, scale: TEAM_COLORS },
-    tooltip: [
-      { field: "winner", title: "Team" },
-      { aggregate: "count", title: "Wins" }
-    ]
-  }
-};
-
-// 2) Wins per team per season (heatmap)
-const spec2 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 380,
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    {
-      calculate: "datum.hscore > datum.ascore ? datum.hteam : (datum.ascore > datum.hscore ? datum.ateam : null)",
-      as: "winner"
-    },
-    { filter: "datum.winner != null" }
-  ],
-  mark: { type: "rect", stroke: "#fff", strokeWidth: 1 },
-  encoding: {
-    x: { field: "year", type: "ordinal", title: "Season" },
-    y: { field: "winner", type: "nominal", title: "Team", sort: "-x" },
-    color: {
-      aggregate: "count",
-      title: "Wins",
-      scale: { scheme: "blues" }
-    },
-    tooltip: [
-      { field: "winner", title: "Team" },
-      { field: "year", title: "Season" },
-      { aggregate: "count", title: "Wins" }
-    ]
-  }
-};
-
-// 3) Home vs away wins (stacked bar)
-const spec3 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 380,
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    {
-      calculate: "datum.hscore > datum.ascore ? datum.hteam : (datum.ascore > datum.hscore ? datum.ateam : null)",
-      as: "winner"
-    },
-    { filter: "datum.winner != null" },
-    {
-      calculate: "datum.hscore > datum.ascore ? 'Home' : 'Away'",
-      as: "venue"
-    }
-  ],
-  mark: { type: "bar" },
-  encoding: {
-    y: { field: "winner", type: "nominal", sort: "-x", title: "Team" },
-    x: { aggregate: "count", title: "Wins" },
-    color: {
-      field: "venue",
-      type: "nominal",
-      scale: { domain: ["Home", "Away"], range: ["#1f77b4", "#ff7f0e"] },
-      title: "Won as"
-    },
-    tooltip: [
-      { field: "winner", title: "Team" },
-      { field: "venue" },
-      { aggregate: "count", title: "Wins" }
-    ]
-  }
-};
-
-// 4) Points scored vs conceded (scatter)
-const spec4 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 420,
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    {
-      fold: ["hteam", "ateam"],
-      as: ["side", "team"]
-    },
-    {
-      calculate: "datum.side == 'hteam' ? datum.hscore : datum.ascore",
-      as: "scored"
-    },
-    {
-      calculate: "datum.side == 'hteam' ? datum.ascore : datum.hscore",
-      as: "conceded"
-    },
-    {
-      aggregate: [
-        { op: "sum", field: "scored", as: "totalScored" },
-        { op: "sum", field: "conceded", as: "totalConceded" },
-        { op: "count", as: "games" }
-      ],
-      groupby: ["team"]
-    }
-  ],
-  mark: { type: "circle", size: 220, opacity: 0.85 },
-  encoding: {
-    x: { field: "totalScored", type: "quantitative", title: "Total points scored" },
-    y: { field: "totalConceded", type: "quantitative", title: "Total points conceded" },
-    color: { field: "team", type: "nominal", legend: null, scale: TEAM_COLORS },
-    tooltip: [
-      { field: "team", title: "Team" },
-      { field: "totalScored", title: "Scored" },
-      { field: "totalConceded", title: "Conceded" },
-      { field: "games", title: "Matches" }
-    ]
-  }
-};
-
-// 5) Score distribution (histogram of every team score)
-const spec5 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 320,
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    { fold: ["hscore", "ascore"], as: ["which", "score"] }
-  ],
-  mark: { type: "bar", color: "#1f77b4" },
-  encoding: {
-    x: {
-      field: "score",
-      bin: { step: 4 },
-      title: "Points scored in a match"
-    },
-    y: { aggregate: "count", title: "Number of team-matches" },
-    tooltip: [
-      { field: "score", bin: { step: 4 }, title: "Score range" },
-      { aggregate: "count", title: "Count" }
-    ]
-  }
-};
-
-// 6) Average winning margin per season
-const spec6 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 320,
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    { calculate: "abs(datum.hscore - datum.ascore)", as: "margin" }
-  ],
-  layer: [
-    {
-      mark: { type: "line", point: true, strokeWidth: 3, color: "#d62728" },
-      encoding: {
-        x: { field: "year", type: "ordinal", title: "Season" },
-        y: { aggregate: "mean", field: "margin", title: "Average winning margin (points)" },
-        tooltip: [
-          { field: "year", title: "Season" },
-          { aggregate: "mean", field: "margin", title: "Avg margin", format: ".1f" }
-        ]
-      }
-    }
-  ]
-};
-
-// Region centroids — used by chart 7 (lookup join)
-const REGION_CENTROIDS = {
-  values: [
-    { region: "NSW", lon: 151.21, lat: -33.87 },
-    { region: "QLD", lon: 145.50, lat: -22.50 },
-    { region: "VIC", lon: 144.96, lat: -37.81 },
-    { region: "ACT", lon: 149.13, lat: -35.28 },
-    { region: "NZ",  lon: 174.76, lat: -36.85 }
-  ]
-};
-
-// 7) Map of matches by region (Australia + NZ)
-const spec7 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 500,
-  projection: { type: "mercator", center: [152, -28], scale: 750 },
-  layer: [
-    {
-      data: {
-        url: "https://vega.github.io/vega-datasets/data/world-110m.json",
-        format: { type: "topojson", feature: "countries" }
-      },
-      mark: { type: "geoshape", fill: "#eef2f5", stroke: "#bbb", strokeWidth: 0.5 }
-    },
-    {
-      data: { url: DATA_URL, format: csvFormat },
-      transform: [
-        { aggregate: [{ op: "count", as: "matches" }], groupby: ["region"] },
-        {
-          lookup: "region",
-          from: { data: REGION_CENTROIDS, key: "region", fields: ["lon", "lat"] }
-        }
-      ],
-      mark: { type: "circle", opacity: 0.75, color: "#d62728", stroke: "#7a0e10", strokeWidth: 1 },
-      encoding: {
-        longitude: { field: "lon", type: "quantitative" },
-        latitude: { field: "lat", type: "quantitative" },
-        size: {
-          field: "matches",
-          type: "quantitative",
-          scale: { range: [100, 3000] },
-          title: "Matches hosted",
-          legend: { orient: "top-right" }
-        },
-        tooltip: [
-          { field: "region", title: "Region" },
-          { field: "matches", title: "Matches" }
-        ]
-      }
-    },
-    {
-      data: { url: DATA_URL, format: csvFormat },
-      transform: [
-        { aggregate: [{ op: "count", as: "matches" }], groupby: ["region"] },
-        {
-          lookup: "region",
-          from: { data: REGION_CENTROIDS, key: "region", fields: ["lon", "lat"] }
-        }
-      ],
-      mark: { type: "text", dy: -28, fontWeight: "bold", fontSize: 12, color: "#222" },
-      encoding: {
-        longitude: { field: "lon", type: "quantitative" },
-        latitude: { field: "lat", type: "quantitative" },
-        text: { field: "region" }
-      }
-    },
-    {
-      data: { url: DATA_URL, format: csvFormat },
-      transform: [
-        { aggregate: [{ op: "count", as: "matches" }], groupby: ["region"] },
-        {
-          lookup: "region",
-          from: { data: REGION_CENTROIDS, key: "region", fields: ["lon", "lat"] }
-        }
-      ],
-      mark: { type: "text", dy: 28, fontSize: 11, color: "#444" },
-      encoding: {
-        longitude: { field: "lon", type: "quantitative" },
-        latitude: { field: "lat", type: "quantitative" },
-        text: { field: "matches" }
-      }
-    }
-  ]
-};
-
-// 8) Top 15 venues by matches hosted
-const spec8 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 380,
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    { aggregate: [{ op: "count", as: "matches" }], groupby: ["location", "region"] },
-    { window: [{ op: "rank", as: "rank" }], sort: [{ field: "matches", order: "descending" }] },
-    { filter: "datum.rank <= 15" }
-  ],
-  mark: { type: "bar" },
-  encoding: {
-    y: { field: "location", type: "nominal", sort: "-x", title: "Venue" },
-    x: { field: "matches", type: "quantitative", title: "Matches hosted" },
-    color: { field: "region", type: "nominal", title: "Region" },
-    tooltip: [
-      { field: "location", title: "Venue" },
-      { field: "region", title: "Region" },
-      { field: "matches", title: "Matches" }
-    ]
-  }
-};
-
-// 9) Head-to-head matchup heatmap
-const spec9 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 480,
-  data: { url: DATA_URL, format: csvFormat },
-  mark: { type: "rect", stroke: "#fff" },
-  encoding: {
-    x: { field: "ateam", type: "nominal", title: "Away team", axis: { labelAngle: -45 } },
-    y: { field: "hteam", type: "nominal", title: "Home team" },
-    color: {
-      aggregate: "count",
-      title: "Matches",
-      scale: { scheme: "greens" }
-    },
-    tooltip: [
-      { field: "hteam", title: "Home" },
-      { field: "ateam", title: "Away" },
-      { aggregate: "count", title: "Matches" }
-    ]
-  }
-};
-
-// 10) Average combined score per round, faceted by season
-const spec10 = {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  width: 1000,
-  height: 320,
-  data: { url: DATA_URL, format: csvFormat },
-  transform: [
-    { calculate: "datum.hscore + datum.ascore", as: "combined" },
-    { filter: "isNumber(toNumber(datum.round))" },
-    { calculate: "toNumber(datum.round)", as: "roundNum" }
-  ],
-  mark: { type: "line", point: true, interpolate: "monotone" },
-  encoding: {
-    x: { field: "roundNum", type: "quantitative", title: "Round" },
-    y: { aggregate: "mean", field: "combined", title: "Avg combined points / match" },
-    color: { field: "year", type: "ordinal", title: "Season", scale: { scheme: "viridis" } },
-    tooltip: [
-      { field: "year", title: "Season" },
-      { field: "roundNum", title: "Round" },
-      { aggregate: "mean", field: "combined", title: "Avg combined", format: ".1f" }
-    ]
-  }
-};
-
+/* Each Vega-Lite spec lives as a standalone, pretty-printed JSON file
+   under specs/. vegaEmbed fetches each URL, then resolves the dataset
+   URLs inside the spec (../datasets/*.csv) relative to the spec file. */
 const opts = { actions: false, renderer: "canvas" };
 const charts = [
-  ["#chart1", spec1], ["#chart2", spec2], ["#chart3", spec3],
-  ["#chart4", spec4], ["#chart5", spec5], ["#chart6", spec6],
-  ["#chart7", spec7], ["#chart8", spec8], ["#chart9", spec9],
-  ["#chart10", spec10]
+  ["#chart-map",        "specs/01-venues-map.json"],
+  ["#chart-lifespan",   "specs/02-club-lifespans.json"],
+  ["#chart-points",     "specs/03-points-per-match.json"],
+  ["#chart-homeaway",   "specs/04-home-vs-away.json"],
+  ["#chart-ridge",      "specs/05-scoreline-ridge.json"],
+  ["#chart-daytime",    "specs/06-kickoff-heatmap.json"],
+  ["#chart-wins",       "specs/07-total-wins.json"],
+  ["#chart-travel",     "specs/08-interstate-trips.json"],
+  ["#chart-bump",       "specs/09-ladder-bump.json"],
+  ["#chart-h2h",        "specs/10-head-to-head.json"],
+  ["#chart-travel-wr",  "specs/11-travel-vs-winrate.json"],
+  ["#chart-radar",      "specs/12-club-fingerprints.json"]
 ];
-charts.forEach(([sel, spec]) => vegaEmbed(sel, spec, opts).catch(console.error));
+charts.forEach(([sel, url]) => {
+  vegaEmbed(sel, url, opts).catch(err => {
+    console.error("Chart failed:", sel, url, err);
+    const el = document.querySelector(sel);
+    if (el) {
+      const msg = String(err && (err.message || err.stack || err));
+      el.innerHTML =
+        '<div style="color:#a30000;padding:1rem;font-family:ui-monospace,monospace;font-size:12px;line-height:1.4;background:#fef6f6;border-left:3px solid #a30000;">' +
+        '<strong>Chart failed:</strong> ' + sel + '<br><strong>Spec:</strong> ' + url +
+        '<br><strong>Error:</strong> ' + msg.replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;') + '</div>';
+    }
+  });
+});
 </script>
 </body>
 </html>

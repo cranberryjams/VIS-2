@@ -4,7 +4,7 @@
   "width": 460,
   "height": 460,
   "data": {
-    "url": "../datasets/match_data.csv",
+    "url": "datasets/match_data.csv",
     "format": {
       "type": "csv",
       "parse": {
@@ -83,7 +83,7 @@
       "lookup": "home",
       "from": {
         "data": {
-          "url": "../datasets/teams.csv",
+          "url": "datasets/teams.csv",
           "format": {
             "type": "csv",
             "parse": {
@@ -109,7 +109,7 @@
       "lookup": "away",
       "from": {
         "data": {
-          "url": "../datasets/teams.csv",
+          "url": "datasets/teams.csv",
           "format": {
             "type": "csv",
             "parse": {
@@ -182,7 +182,7 @@
       "lookup": "team",
       "from": {
         "data": {
-          "url": "../datasets/teams.csv",
+          "url": "datasets/teams.csv",
           "format": {
             "type": "csv",
             "parse": {
