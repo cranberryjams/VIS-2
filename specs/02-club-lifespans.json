@@ -38,10 +38,14 @@
         "y": {
           "field": "team",
           "type": "nominal",
-          "sort": {
-            "field": "founded",
-            "order": "ascending"
-          },
+          "sort": [
+            "Rabbitohs", "Roosters", "Western Suburbs", "Balmain", "North Sydney",
+            "St George", "Bulldogs", "Sea Eagles", "Eels", "Panthers", "Sharks",
+            "Raiders", "Illawarra", "Broncos", "Knights", "Gold Coast Chargers",
+            "Cowboys", "Warriors", "South Queensland", "Western Reds",
+            "Hunter Mariners", "Adelaide Rams", "Storm", "Dragons", "Wests Tigers",
+            "Northern Eagles", "Titans", "Dolphins"
+          ],
           "title": null,
           "axis": {
             "labelFontSize": 11,
@@ -123,10 +127,14 @@
         "y": {
           "field": "team",
           "type": "nominal",
-          "sort": {
-            "field": "founded",
-            "order": "ascending"
-          }
+          "sort": [
+            "Rabbitohs", "Roosters", "Western Suburbs", "Balmain", "North Sydney",
+            "St George", "Bulldogs", "Sea Eagles", "Eels", "Panthers", "Sharks",
+            "Raiders", "Illawarra", "Broncos", "Knights", "Gold Coast Chargers",
+            "Cowboys", "Warriors", "South Queensland", "Western Reds",
+            "Hunter Mariners", "Adelaide Rams", "Storm", "Dragons", "Wests Tigers",
+            "Northern Eagles", "Titans", "Dolphins"
+          ]
         },
         "x": {
           "field": "end",
