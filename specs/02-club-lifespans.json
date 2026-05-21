@@ -31,9 +31,29 @@
     {
       "mark": {
         "type": "bar",
-        "cornerRadius": 2
+        "cornerRadius": 2,
+        "stroke": "#14181d"
       },
+      "params": [
+        {
+          "name": "hover_club",
+          "select": {
+            "type": "point",
+            "on": "pointerover",
+            "clear": "pointerout",
+            "fields": ["team"]
+          }
+        }
+      ],
       "encoding": {
+        "strokeWidth": {
+          "condition": {
+            "param": "hover_club",
+            "empty": false,
+            "value": 2
+          },
+          "value": 0
+        },
         "y": {
           "field": "team",
           "type": "nominal",
