@@ -3,6 +3,10 @@
   "description": "Scatter of interstate trips made against win rate per active club. Derived in-spec: per-team games, wins, and interstate trips.",
   "width": 460,
   "height": 460,
+  "autosize": {
+    "type": "fit",
+    "contains": "padding"
+  },
   "data": {
     "url": "datasets/match_data.csv",
     "format": {

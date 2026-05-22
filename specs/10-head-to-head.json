@@ -3,6 +3,10 @@
   "description": "Head-to-head matrix of home win rate for the 17 active NRL clubs. Cells are coloured by the home team's win rate against each away team across all NRL matches 1998–2025.",
   "width": 460,
   "height": 460,
+  "autosize": {
+    "type": "fit",
+    "contains": "padding"
+  },
   "data": {
     "url": "datasets/match_data.csv",
     "format": {
