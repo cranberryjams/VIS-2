@@ -162,7 +162,7 @@
       ]
     },
     {
-      "calculate": "60 - datum.def_avg",
+      "calculate": "45 - datum.def_avg",
       "as": "def"
     },
     {
@@ -176,31 +176,48 @@
     {
       "calculate": "(datum.games - datum.homes) > 0 ? datum.away_wins / (datum.games - datum.homes) : 0",
       "as": "away_wr"
+    },
+    {
+      "window": [
+        {
+          "op": "rank",
+          "as": "wr_rank"
+        }
+      ],
+      "sort": [
+        {
+          "field": "wr_overall",
+          "order": "descending"
+        }
+      ]
+    },
+    {
+      "filter": "datum.wr_rank <= 8"
     }
   ],
   "facet": {
     "field": "team",
     "type": "nominal",
-    "columns": 4,
     "sort": {
       "field": "wr_overall",
       "order": "descending"
     },
     "header": {
-      "labelFontSize": 12,
+      "labelFontSize": 14,
       "labelFontWeight": 700,
       "labelOrient": "top",
       "labelAnchor": "start",
-      "labelPadding": 4,
+      "labelPadding": 6,
       "title": null
     }
   },
+  "columns": 4,
   "spec": {
-    "width": 200,
-    "height": 110,
+    "width": 220,
+    "height": 170,
     "transform": [
       {
-        "calculate": "[ {axis:'ATK',  v: datum.atk,           maxV: 32,  label: format(datum.atk, '.1f') + ' pts/g'},  {axis:'DEF',  v: datum.def,           maxV: 32,  label: format(datum.def_avg, '.1f') + ' conceded'},  {axis:'FIN',  v: datum.finals_games,  maxV: 60,  label: datum.finals_games + ' finals games'},  {axis:'HOM',  v: datum.home_wr,       maxV: 1,   label: format(datum.home_wr, '.0%') + ' home WR'},  {axis:'AWY',  v: datum.away_wr,       maxV: 1,   label: format(datum.away_wr, '.0%') + ' away WR'} ]",
+        "calculate": "[ {axis:'ATK',  v: datum.atk,           maxV: 30,  label: format(datum.atk, '.1f') + ' pts/g'},  {axis:'DEF',  v: datum.def,           maxV: 30,  label: format(datum.def_avg, '.1f') + ' conceded'},  {axis:'FIN',  v: datum.finals_games,  maxV: 60,  label: datum.finals_games + ' finals games'},  {axis:'HOM',  v: datum.home_wr,       maxV: 1,   label: format(datum.home_wr, '.0%') + ' home WR'},  {axis:'AWY',  v: datum.away_wr,       maxV: 1,   label: format(datum.away_wr, '.0%') + ' away WR'} ]",
         "as": "axes"
       },
       {
@@ -229,37 +246,51 @@
         "as": "norm"
       }
     ],
+    "encoding": {
+      "y": {
+        "field": "axis",
+        "type": "nominal",
+        "sort": [
+          "ATK",
+          "DEF",
+          "FIN",
+          "HOM",
+          "AWY"
+        ],
+        "title": null,
+        "axis": {
+          "labelFontSize": 11,
+          "labelFontWeight": 600,
+          "ticks": false,
+          "domain": false
+        }
+      },
+      "x": {
+        "field": "norm",
+        "type": "quantitative",
+        "scale": {
+          "domain": [
+            0,
+            1
+          ],
+          "clamp": true
+        },
+        "axis": null
+      }
+    },
     "layer": [
       {
         "mark": {
           "type": "bar",
           "color": "#e2ecdf",
-          "height": 8
+          "height": 14
         },
         "encoding": {
-          "y": {
-            "field": "axis",
-            "type": "nominal",
-            "sort": [
-              "ATK",
-              "DEF",
-              "FIN",
-              "HOM",
-              "AWY"
-            ],
-            "title": null,
-            "axis": {
-              "labelFontSize": 10,
-              "labelFontWeight": 600,
-              "ticks": false,
-              "domain": false
-            }
-          },
           "x": {
-            "value": 0
+            "datum": 0
           },
           "x2": {
-            "value": 180
+            "datum": 1
           }
         }
       },
@@ -267,36 +298,15 @@
         "mark": {
           "type": "bar",
           "color": "#006633",
-          "height": 8
+          "height": 14
         },
         "encoding": {
-          "y": {
-            "field": "axis",
-            "type": "nominal",
-            "sort": [
-              "ATK",
-              "DEF",
-              "FIN",
-              "HOM",
-              "AWY"
-            ]
-          },
           "x": {
-            "value": 0
+            "datum": 0
           },
           "x2": {
             "field": "norm",
-            "type": "quantitative",
-            "scale": {
-              "domain": [
-                0,
-                1
-              ],
-              "range": [
-                0,
-                180
-              ]
-            }
+            "type": "quantitative"
           },
           "tooltip": [
             {
