@@ -1,12 +1,78 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Radar / spider chart overlaying the four highest win-rate currently-active NRL clubs across five performance metrics (attack, defence, finals games played, home win-rate, away win-rate). Custom-built: polygon vertices are derived in-spec via polar-to-cartesian transforms on normalised metric values, drawn with a line mark using linear-closed interpolation, on a hand-rendered grid of concentric pentagonal rings and five radial spokes.",
-  "width": 480,
+  "description": "Radar / spider chart overlaying the four highest win-rate currently-active NRL clubs across five performance metrics (attack, defence, finals games played, home win-rate, away win-rate). Custom-built: polygon vertices are derived in-spec by converting normalised metric values to (x, y) via sin / cos with a PI/5 angle step, then drawn with line marks using linear-closed interpolation. Reference grid is four hand-rendered concentric pentagonal rings plus five radial spokes.",
+  "width": 520,
   "height": 480,
   "config": {
-    "view": { "stroke": null },
-    "axis": { "grid": false, "domain": false, "ticks": false, "labels": false }
+    "view": { "stroke": null }
   },
+  "data": {
+    "url": "datasets/match_data.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "date": "date",
+        "home_team_score": "number",
+        "away_team_score": "number"
+      }
+    }
+  },
+  "transform": [
+    { "filter": "datum.competition == 'NRL'" },
+    {
+      "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' : 'Other'",
+      "as": "home"
+    },
+    {
+      "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' : 'Other'",
+      "as": "away"
+    },
+    { "filter": "datum.home != 'Other' && datum.away != 'Other'" },
+    { "fold": ["home", "away"], "as": ["side", "team"] },
+    { "calculate": "datum.side == 'home' ? datum.home_team_score : datum.away_team_score", "as": "scored" },
+    { "calculate": "datum.side == 'home' ? datum.away_team_score : datum.home_team_score", "as": "conceded" },
+    { "calculate": "datum.scored > datum.conceded ? 1 : 0", "as": "win" },
+    { "calculate": "datum.side == 'home' ? 1 : 0", "as": "is_home" },
+    { "calculate": "datum.side == 'home' && datum.win == 1 ? 1 : 0", "as": "home_win" },
+    { "calculate": "datum.side == 'away' && datum.win == 1 ? 1 : 0", "as": "away_win" },
+    { "calculate": "test(/^Round /, datum.round) ? 0 : 1", "as": "is_final" },
+    {
+      "aggregate": [
+        { "op": "mean", "field": "scored", "as": "atk" },
+        { "op": "mean", "field": "conceded", "as": "def_avg" },
+        { "op": "sum", "field": "is_final", "as": "finals_games" },
+        { "op": "sum", "field": "win", "as": "wins" },
+        { "op": "sum", "field": "is_home", "as": "homes" },
+        { "op": "sum", "field": "home_win", "as": "home_wins" },
+        { "op": "sum", "field": "away_win", "as": "away_wins" },
+        { "op": "count", "as": "games" }
+      ],
+      "groupby": ["team"]
+    },
+    { "calculate": "45 - datum.def_avg", "as": "def" },
+    { "calculate": "datum.wins / datum.games", "as": "wr_overall" },
+    { "calculate": "datum.homes > 0 ? datum.home_wins / datum.homes : 0", "as": "home_wr" },
+    { "calculate": "(datum.games - datum.homes) > 0 ? datum.away_wins / (datum.games - datum.homes) : 0", "as": "away_wr" },
+    {
+      "window": [{ "op": "rank", "as": "wr_rank" }],
+      "sort": [{ "field": "wr_overall", "order": "descending" }]
+    },
+    { "filter": "datum.wr_rank <= 4" },
+    {
+      "calculate": "[ {axis:'ATK', v: datum.atk, maxV: 30, label: format(datum.atk, '.1f') + ' pts/g'}, {axis:'DEF', v: datum.def, maxV: 30, label: format(datum.def_avg, '.1f') + ' conceded'}, {axis:'FIN', v: datum.finals_games, maxV: 60, label: datum.finals_games + ' finals games'}, {axis:'HOM', v: datum.home_wr, maxV: 1, label: format(datum.home_wr, '.0%') + ' home WR'}, {axis:'AWY', v: datum.away_wr, maxV: 1, label: format(datum.away_wr, '.0%') + ' away WR'} ]",
+      "as": "axes"
+    },
+    { "flatten": ["axes"] },
+    { "calculate": "datum.axes.axis", "as": "axis" },
+    { "calculate": "datum.axes.v", "as": "v" },
+    { "calculate": "datum.axes.maxV", "as": "maxV" },
+    { "calculate": "datum.axes.label", "as": "label" },
+    { "calculate": "min(1, datum.v / datum.maxV)", "as": "norm" },
+    { "calculate": "indexof(['ATK','DEF','FIN','HOM','AWY'], datum.axis)", "as": "axis_idx" },
+    { "calculate": "datum.norm * sin(datum.axis_idx * 2 * PI / 5)", "as": "x" },
+    { "calculate": "-1 * datum.norm * cos(datum.axis_idx * 2 * PI / 5)", "as": "y" }
+  ],
+  "resolve": { "scale": { "x": "shared", "y": "shared", "color": "independent" } },
   "layer": [
     {
       "data": {
@@ -37,8 +103,7 @@
         "type": "line",
         "interpolate": "linear-closed",
         "stroke": "#e3ddd1",
-        "strokeWidth": 1,
-        "fill": null
+        "strokeWidth": 1
       },
       "encoding": {
         "x": { "field": "x", "type": "quantitative", "scale": { "domain": [-1.35, 1.35] }, "axis": null },
@@ -57,11 +122,7 @@
           { "x0": 0, "y0": 0, "x": -0.951, "y": -0.309 }
         ]
       },
-      "mark": {
-        "type": "rule",
-        "stroke": "#cfc6b1",
-        "strokeWidth": 1
-      },
+      "mark": { "type": "rule", "stroke": "#cfc6b1", "strokeWidth": 1 },
       "encoding": {
         "x": { "field": "x0", "type": "quantitative", "axis": null },
         "y": { "field": "y0", "type": "quantitative", "axis": null },
@@ -79,154 +140,109 @@
           { "x": -1.141, "y": -0.371, "label": "AWY" }
         ]
       },
-      "mark": {
-        "type": "text",
-        "fontSize": 13,
-        "fontWeight": 700,
-        "color": "#14181d",
-        "align": "center",
-        "baseline": "middle"
-      },
+      "mark": { "type": "text", "fontSize": 13, "fontWeight": 700, "color": "#14181d" },
       "encoding": {
-        "x": { "field": "x", "type": "quantitative" },
-        "y": { "field": "y", "type": "quantitative" },
+        "x": { "field": "x", "type": "quantitative", "axis": null },
+        "y": { "field": "y", "type": "quantitative", "axis": null },
         "text": { "field": "label" }
       }
     },
     {
-      "data": {
-        "url": "datasets/match_data.csv",
-        "format": {
-          "type": "csv",
-          "parse": {
-            "date": "date",
-            "home_team_score": "number",
-            "away_team_score": "number"
-          }
-        }
+      "transform": [{ "filter": "datum.team == 'Storm'" }],
+      "mark": {
+        "type": "line",
+        "interpolate": "linear-closed",
+        "stroke": "#582C83",
+        "strokeWidth": 2.5,
+        "fill": "#582C83",
+        "fillOpacity": 0.18
       },
-      "transform": [
-        { "filter": "datum.competition == 'NRL'" },
-        {
-          "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' : 'Other'",
-          "as": "home"
-        },
-        {
-          "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' : 'Other'",
-          "as": "away"
-        },
-        { "filter": "datum.home != 'Other' && datum.away != 'Other'" },
-        { "fold": ["home", "away"], "as": ["side", "team"] },
-        { "calculate": "datum.side == 'home' ? datum.home_team_score : datum.away_team_score", "as": "scored" },
-        { "calculate": "datum.side == 'home' ? datum.away_team_score : datum.home_team_score", "as": "conceded" },
-        { "calculate": "datum.scored > datum.conceded ? 1 : 0", "as": "win" },
-        { "calculate": "datum.side == 'home' ? 1 : 0", "as": "is_home" },
-        { "calculate": "datum.side == 'home' && datum.win == 1 ? 1 : 0", "as": "home_win" },
-        { "calculate": "datum.side == 'away' && datum.win == 1 ? 1 : 0", "as": "away_win" },
-        { "calculate": "test(/^Round /, datum.round) ? 0 : 1", "as": "is_final" },
-        {
-          "aggregate": [
-            { "op": "mean", "field": "scored", "as": "atk" },
-            { "op": "mean", "field": "conceded", "as": "def_avg" },
-            { "op": "sum", "field": "is_final", "as": "finals_games" },
-            { "op": "sum", "field": "win", "as": "wins" },
-            { "op": "sum", "field": "is_home", "as": "homes" },
-            { "op": "sum", "field": "home_win", "as": "home_wins" },
-            { "op": "sum", "field": "away_win", "as": "away_wins" },
-            { "op": "count", "as": "games" }
-          ],
-          "groupby": ["team"]
-        },
-        { "calculate": "45 - datum.def_avg", "as": "def" },
-        { "calculate": "datum.wins / datum.games", "as": "wr_overall" },
-        { "calculate": "datum.homes > 0 ? datum.home_wins / datum.homes : 0", "as": "home_wr" },
-        { "calculate": "(datum.games - datum.homes) > 0 ? datum.away_wins / (datum.games - datum.homes) : 0", "as": "away_wr" },
-        {
-          "window": [{ "op": "rank", "as": "wr_rank" }],
-          "sort": [{ "field": "wr_overall", "order": "descending" }]
-        },
-        { "filter": "datum.wr_rank <= 4" },
-        {
-          "calculate": "[ {axis:'ATK',  v: datum.atk,           maxV: 30,  label: format(datum.atk, '.1f') + ' pts/g'},  {axis:'DEF',  v: datum.def,           maxV: 30,  label: format(datum.def_avg, '.1f') + ' conceded'},  {axis:'FIN',  v: datum.finals_games,  maxV: 60,  label: datum.finals_games + ' finals games'},  {axis:'HOM',  v: datum.home_wr,       maxV: 1,   label: format(datum.home_wr, '.0%') + ' home WR'},  {axis:'AWY',  v: datum.away_wr,       maxV: 1,   label: format(datum.away_wr, '.0%') + ' away WR'} ]",
-          "as": "axes"
-        },
-        { "flatten": ["axes"] },
-        { "calculate": "datum.axes.axis", "as": "axis" },
-        { "calculate": "datum.axes.v", "as": "v" },
-        { "calculate": "datum.axes.maxV", "as": "maxV" },
-        { "calculate": "datum.axes.label", "as": "label" },
-        { "calculate": "min(1, datum.v / datum.maxV)", "as": "norm" },
-        { "calculate": "indexof(['ATK','DEF','FIN','HOM','AWY'], datum.axis)", "as": "axis_idx" },
-        { "calculate": "datum.norm * sin(datum.axis_idx * 2 * PI / 5)", "as": "x" },
-        { "calculate": "-1 * datum.norm * cos(datum.axis_idx * 2 * PI / 5)", "as": "y" }
-      ],
-      "layer": [
-        {
-          "mark": {
-            "type": "line",
-            "interpolate": "linear-closed",
-            "strokeWidth": 2.5,
-            "fillOpacity": 0.15
+      "encoding": {
+        "x": { "field": "x", "type": "quantitative", "axis": null },
+        "y": { "field": "y", "type": "quantitative", "axis": null },
+        "order": { "field": "axis_idx", "type": "quantitative" }
+      }
+    },
+    {
+      "transform": [{ "filter": "datum.team == 'Roosters'" }],
+      "mark": {
+        "type": "line",
+        "interpolate": "linear-closed",
+        "stroke": "#001F5C",
+        "strokeWidth": 2.5,
+        "fill": "#001F5C",
+        "fillOpacity": 0.18
+      },
+      "encoding": {
+        "x": { "field": "x", "type": "quantitative", "axis": null },
+        "y": { "field": "y", "type": "quantitative", "axis": null },
+        "order": { "field": "axis_idx", "type": "quantitative" }
+      }
+    },
+    {
+      "transform": [{ "filter": "datum.team == 'Broncos'" }],
+      "mark": {
+        "type": "line",
+        "interpolate": "linear-closed",
+        "stroke": "#860038",
+        "strokeWidth": 2.5,
+        "fill": "#860038",
+        "fillOpacity": 0.18
+      },
+      "encoding": {
+        "x": { "field": "x", "type": "quantitative", "axis": null },
+        "y": { "field": "y", "type": "quantitative", "axis": null },
+        "order": { "field": "axis_idx", "type": "quantitative" }
+      }
+    },
+    {
+      "transform": [{ "filter": "datum.team == 'Panthers'" }],
+      "mark": {
+        "type": "line",
+        "interpolate": "linear-closed",
+        "stroke": "#000000",
+        "strokeWidth": 2.5,
+        "fill": "#000000",
+        "fillOpacity": 0.18
+      },
+      "encoding": {
+        "x": { "field": "x", "type": "quantitative", "axis": null },
+        "y": { "field": "y", "type": "quantitative", "axis": null },
+        "order": { "field": "axis_idx", "type": "quantitative" }
+      }
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "size": 70,
+        "stroke": "#fbf8f3",
+        "strokeWidth": 1.5
+      },
+      "encoding": {
+        "x": { "field": "x", "type": "quantitative", "axis": null },
+        "y": { "field": "y", "type": "quantitative", "axis": null },
+        "color": {
+          "field": "team",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Storm", "Roosters", "Broncos", "Panthers"],
+            "range": ["#582C83", "#001F5C", "#860038", "#000000"]
           },
-          "encoding": {
-            "x": { "field": "x", "type": "quantitative", "axis": null },
-            "y": { "field": "y", "type": "quantitative", "axis": null },
-            "order": { "field": "axis_idx", "type": "quantitative" },
-            "stroke": {
-              "field": "team",
-              "type": "nominal",
-              "scale": {
-                "domain": ["Storm", "Roosters", "Broncos", "Panthers"],
-                "range": ["#582C83", "#001F5C", "#860038", "#000000"]
-              },
-              "title": null,
-              "legend": {
-                "orient": "right",
-                "labelFontSize": 12,
-                "symbolType": "stroke",
-                "symbolStrokeWidth": 3,
-                "rowPadding": 6
-              }
-            },
-            "fill": {
-              "field": "team",
-              "type": "nominal",
-              "scale": {
-                "domain": ["Storm", "Roosters", "Broncos", "Panthers"],
-                "range": ["#582C83", "#001F5C", "#860038", "#000000"]
-              },
-              "legend": null
-            },
-            "detail": { "field": "team", "type": "nominal" }
+          "title": null,
+          "legend": {
+            "orient": "right",
+            "labelFontSize": 13,
+            "symbolType": "circle",
+            "symbolSize": 160,
+            "rowPadding": 6
           }
         },
-        {
-          "mark": {
-            "type": "circle",
-            "size": 70,
-            "stroke": "#fbf8f3",
-            "strokeWidth": 1.5
-          },
-          "encoding": {
-            "x": { "field": "x", "type": "quantitative", "axis": null },
-            "y": { "field": "y", "type": "quantitative", "axis": null },
-            "fill": {
-              "field": "team",
-              "type": "nominal",
-              "scale": {
-                "domain": ["Storm", "Roosters", "Broncos", "Panthers"],
-                "range": ["#582C83", "#001F5C", "#860038", "#000000"]
-              },
-              "legend": null
-            },
-            "tooltip": [
-              { "field": "team", "title": "Club" },
-              { "field": "axis", "title": "Metric" },
-              { "field": "label", "title": "Value" }
-            ]
-          }
-        }
-      ]
+        "tooltip": [
+          { "field": "team", "title": "Club" },
+          { "field": "axis", "title": "Metric" },
+          { "field": "label", "title": "Value" }
+        ]
+      }
     }
   ]
 }
