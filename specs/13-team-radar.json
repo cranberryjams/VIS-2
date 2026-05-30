@@ -28,6 +28,8 @@
       "as": "away"
     },
     { "filter": "datum.home != 'Other' && datum.away != 'Other'" },
+    { "calculate": "year(datum.date)", "as": "season" },
+    { "filter": "datum.season >= 2007 && datum.season <= 2024" },
     { "fold": ["home", "away"], "as": ["side", "team"] },
     { "calculate": "datum.side == 'home' ? datum.home_team_score : datum.away_team_score", "as": "scored" },
     { "calculate": "datum.side == 'home' ? datum.away_team_score : datum.home_team_score", "as": "conceded" },
@@ -54,12 +56,10 @@
     { "calculate": "datum.homes > 0 ? datum.home_wins / datum.homes : 0", "as": "home_wr" },
     { "calculate": "(datum.games - datum.homes) > 0 ? datum.away_wins / (datum.games - datum.homes) : 0", "as": "away_wr" },
     {
-      "window": [{ "op": "rank", "as": "wr_rank" }],
-      "sort": [{ "field": "wr_overall", "order": "descending" }]
+      "filter": "indexof(['Storm','Roosters','Broncos','Panthers'], datum.team) >= 0"
     },
-    { "filter": "datum.wr_rank <= 4" },
     {
-      "calculate": "[ {axis:'ATK', v: datum.atk, maxV: 30, label: format(datum.atk, '.1f') + ' pts/g'}, {axis:'DEF', v: datum.def, maxV: 30, label: format(datum.def_avg, '.1f') + ' conceded'}, {axis:'FIN', v: datum.finals_games, maxV: 60, label: datum.finals_games + ' finals games'}, {axis:'HOM', v: datum.home_wr, maxV: 1, label: format(datum.home_wr, '.0%') + ' home WR'}, {axis:'AWY', v: datum.away_wr, maxV: 1, label: format(datum.away_wr, '.0%') + ' away WR'} ]",
+      "calculate": "[ {axis:'ATK', v: datum.atk, maxV: 30, label: format(datum.atk, '.1f') + ' pts/g'}, {axis:'DEF', v: datum.def, maxV: 30, label: format(datum.def_avg, '.1f') + ' conceded'}, {axis:'FIN', v: datum.finals_games, maxV: 40, label: datum.finals_games + ' finals games'}, {axis:'HOM', v: datum.home_wr, maxV: 1, label: format(datum.home_wr, '.0%') + ' home WR'}, {axis:'AWY', v: datum.away_wr, maxV: 1, label: format(datum.away_wr, '.0%') + ' away WR'} ]",
       "as": "axes"
     },
     { "flatten": ["axes"] },
