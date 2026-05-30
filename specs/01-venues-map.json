@@ -141,7 +141,10 @@
           "title": "Home matches",
           "legend": {
             "orient": "right",
-            "offset": 12
+            "offset": 12,
+            "titleFontSize": 13,
+            "labelFontSize": 12,
+            "rowPadding": 6
           }
         },
         "color": {
@@ -170,7 +173,11 @@
           },
           "legend": {
             "orient": "right",
-            "offset": 12
+            "offset": 12,
+            "titleFontSize": 13,
+            "labelFontSize": 12,
+            "symbolSize": 180,
+            "rowPadding": 4
           }
         },
         "tooltip": [
