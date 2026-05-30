@@ -1,0 +1,238 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Per-team season trajectory in (attack, defence) space. Each line traces a club's signature — average points scored vs average points conceded per match — across every season they competed (1998–2024). League-average crosshairs split the space into four style quadrants (Strong attack & defence, Attacking only, Defensive grind, Struggling). Four signature clubs are colour-highlighted against the other thirteen rendered as a quiet grey backdrop. Combines connected-scatter, quadrant overlay, time-encoded markers and end-of-line labels.",
+  "width": 920,
+  "height": 520,
+  "data": {
+    "url": "datasets/match_data.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "date": "date",
+        "home_team_score": "number",
+        "away_team_score": "number"
+      }
+    }
+  },
+  "transform": [
+    { "filter": "datum.competition == 'NRL' && isValid(datum.home_team_score) && isValid(datum.away_team_score)" },
+    {
+      "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'Melbourne Storm' ? 'Storm' :datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.home_team == 'St George Dragons' ? 'St George' :datum.home_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' :datum.home_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.home_team == 'Balmain Tigers' ? 'Balmain' :(datum.home_team == 'Auckland Warriors' || datum.home_team == 'New Zealand Warriors' || datum.home_team == 'Warriors') ? 'Warriors' :datum.home_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' :datum.home_team == 'North Sydney Bears' ? 'North Sydney' :datum.home_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.home_team == 'Northern Eagles' ? 'Northern Eagles' :datum.home_team",
+      "as": "home"
+    },
+    {
+      "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.away_team == 'St George Dragons' ? 'St George' :datum.away_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :datum.away_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.away_team == 'Balmain Tigers' ? 'Balmain' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' :datum.away_team == 'North Sydney Bears' ? 'North Sydney' :datum.away_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.away_team == 'Northern Eagles' ? 'Northern Eagles' :datum.away_team",
+      "as": "away"
+    },
+    { "calculate": "year(datum.date)", "as": "season" },
+    { "filter": "datum.season >= 1998 && datum.season <= 2024" },
+    { "filter": "test(/^Round /, datum.round)" },
+    {
+      "fold": ["home", "away"],
+      "as": ["side", "team"]
+    },
+    {
+      "calculate": "datum.side == 'home' ? datum.home_team_score : datum.away_team_score",
+      "as": "scored"
+    },
+    {
+      "calculate": "datum.side == 'home' ? datum.away_team_score : datum.home_team_score",
+      "as": "conceded"
+    },
+    {
+      "aggregate": [
+        { "op": "mean", "field": "scored", "as": "atk" },
+        { "op": "mean", "field": "conceded", "as": "def" },
+        { "op": "count", "as": "games" }
+      ],
+      "groupby": ["team", "season"]
+    },
+    { "filter": "datum.games >= 8" },
+    {
+      "calculate": "indexof(['Storm','Panthers','Bulldogs','Broncos'], datum.team) >= 0",
+      "as": "is_highlight"
+    },
+    {
+      "window": [{ "op": "rank", "as": "rev_rank" }],
+      "sort": [{ "field": "season", "order": "descending" }],
+      "groupby": ["team"]
+    }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "rule", "color": "#cfc6b1", "strokeWidth": 1, "strokeDash": [4, 4] },
+      "encoding": {
+        "x": { "aggregate": "mean", "field": "atk", "type": "quantitative" }
+      }
+    },
+    {
+      "mark": { "type": "rule", "color": "#cfc6b1", "strokeWidth": 1, "strokeDash": [4, 4] },
+      "encoding": {
+        "y": { "aggregate": "mean", "field": "def", "type": "quantitative" }
+      }
+    },
+    {
+      "data": {
+        "values": [
+          { "x": 27.5, "y": 13.5, "label": "Strong attack & defence" },
+          { "x": 13.5, "y": 13.5, "label": "Defensive grind" },
+          { "x": 27.5, "y": 28.5, "label": "Attacking only" },
+          { "x": 13.5, "y": 28.5, "label": "Struggling" }
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "fontSize": 10,
+        "fontStyle": "italic",
+        "fontWeight": 600,
+        "color": "#8a8578"
+      },
+      "encoding": {
+        "x": { "field": "x", "type": "quantitative" },
+        "y": { "field": "y", "type": "quantitative" },
+        "text": { "field": "label" }
+      }
+    },
+    {
+      "transform": [{ "filter": "!datum.is_highlight" }],
+      "mark": {
+        "type": "line",
+        "interpolate": "monotone",
+        "strokeWidth": 1,
+        "color": "#cfc6b1",
+        "opacity": 0.7
+      },
+      "encoding": {
+        "x": {
+          "field": "atk",
+          "type": "quantitative",
+          "title": "Attack: average points scored per match",
+          "scale": { "domain": [12, 30] },
+          "axis": { "grid": false }
+        },
+        "y": {
+          "field": "def",
+          "type": "quantitative",
+          "title": "Defence: average points conceded per match (top = strong defence)",
+          "scale": { "domain": [30, 12] },
+          "axis": { "grid": false }
+        },
+        "order": { "field": "season", "type": "quantitative" },
+        "detail": { "field": "team", "type": "nominal" }
+      }
+    },
+    {
+      "transform": [{ "filter": "!datum.is_highlight" }],
+      "mark": {
+        "type": "circle",
+        "size": 14,
+        "color": "#a8a190",
+        "opacity": 0.55
+      },
+      "encoding": {
+        "x": { "field": "atk", "type": "quantitative" },
+        "y": { "field": "def", "type": "quantitative" }
+      }
+    },
+    {
+      "transform": [{ "filter": "datum.is_highlight" }],
+      "mark": {
+        "type": "line",
+        "interpolate": "monotone",
+        "strokeWidth": 2.5,
+        "opacity": 0.95
+      },
+      "encoding": {
+        "x": { "field": "atk", "type": "quantitative" },
+        "y": { "field": "def", "type": "quantitative" },
+        "order": { "field": "season", "type": "quantitative" },
+        "color": {
+          "field": "team",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Storm", "Panthers", "Bulldogs", "Broncos"],
+            "range": ["#582C83", "#000000", "#003B70", "#860038"]
+          },
+          "title": null,
+          "legend": { "orient": "top" }
+        },
+        "detail": { "field": "team", "type": "nominal" }
+      }
+    },
+    {
+      "transform": [{ "filter": "datum.is_highlight" }],
+      "mark": {
+        "type": "circle",
+        "size": 70,
+        "stroke": "#fbf8f3",
+        "strokeWidth": 1.2
+      },
+      "encoding": {
+        "x": { "field": "atk", "type": "quantitative" },
+        "y": { "field": "def", "type": "quantitative" },
+        "color": {
+          "field": "team",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Storm", "Panthers", "Bulldogs", "Broncos"],
+            "range": ["#582C83", "#000000", "#003B70", "#860038"]
+          },
+          "legend": null
+        },
+        "tooltip": [
+          { "field": "team", "title": "Club" },
+          { "field": "season", "title": "Season", "format": "d" },
+          { "field": "atk", "title": "Avg scored", "format": ".1f" },
+          { "field": "def", "title": "Avg conceded", "format": ".1f" }
+        ]
+      }
+    },
+    {
+      "transform": [{ "filter": "datum.is_highlight && datum.rev_rank == 1" }],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "dx": 8,
+        "fontSize": 11,
+        "fontWeight": 700,
+        "color": "#14181d",
+        "stroke": "#fbf8f3",
+        "strokeWidth": 3
+      },
+      "encoding": {
+        "x": { "field": "atk", "type": "quantitative" },
+        "y": { "field": "def", "type": "quantitative" },
+        "text": { "field": "team" }
+      }
+    },
+    {
+      "transform": [{ "filter": "datum.is_highlight && datum.rev_rank == 1" }],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "dx": 8,
+        "fontSize": 11,
+        "fontWeight": 700
+      },
+      "encoding": {
+        "x": { "field": "atk", "type": "quantitative" },
+        "y": { "field": "def", "type": "quantitative" },
+        "text": { "field": "team" },
+        "color": {
+          "field": "team",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Storm", "Panthers", "Bulldogs", "Broncos"],
+            "range": ["#582C83", "#000000", "#003B70", "#860038"]
+          },
+          "legend": null
+        }
+      }
+    }
+  ],
+  "config": {
+    "view": { "stroke": null }
+  }
+}

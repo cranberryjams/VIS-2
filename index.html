@@ -311,6 +311,10 @@
     <p class="chart-note">Five metrics for the <span class="em">eight strongest currently-active clubs</span> by overall win-rate (1998–2025): attack (avg points scored), defence (avg points conceded, inverted so longer = better), finals games played, home win-rate, and away win-rate.</p>
     <div class="chart" id="chart-radar"></div>
 
+    <h3 class="chart-title"><span class="num-badge">13</span>A team's signature, 1998 – 2024</h3>
+    <p class="chart-note">Each line traces one club's <span class="em">style trajectory</span>: every season is a point at (average points scored, average points conceded), connected season by season. The dashed crosshairs mark the league average and split the chart into four style quadrants. The <span class="em">Storm</span> live almost entirely in the strong-defence half. The <span class="em">Panthers</span> march steadily into the elite top-right corner across the modern dynasty. The <span class="em">Bulldogs</span> drift down and left. The <span class="em">Broncos</span> swing across the strong-attack region across the era. The other thirteen clubs sit as grey context lines.</p>
+    <div class="chart" id="chart-signature"></div>
+
   </section>
 
   <hr class="rule" />
@@ -319,7 +323,7 @@
       <div>
         <h4>About this visualisation</h4>
         <p>Created by <strong>James Deng</strong> for <em>FIT2179 Data Visualisation</em>, Monash University, Semester 1 2026. Published May 2026.</p>
-        <p>All twelve charts were built with <a href="https://vega.github.io/vega-lite/">Vega-Lite</a>; the page layout uses <a href="https://purecss.io/">Pure.css</a>. Typography pairs <em>Bebas Neue</em>, <em>Playfair Display</em>, and <em>Inter</em>.</p>
+        <p>All thirteen charts were built with <a href="https://vega.github.io/vega-lite/">Vega-Lite</a>; the page layout uses <a href="https://purecss.io/">Pure.css</a>. Typography pairs <em>Bebas Neue</em>, <em>Playfair Display</em>, and <em>Inter</em>.</p>
         <p>Source code, datasets, and the Vega-Lite JSON specifications for every chart are available in the GitHub repository: <a href="https://github.com/cranberryjams/VIS-2">github.com/cranberryjams/VIS-2</a>.</p>
       </div>
       <div>
@@ -327,7 +331,7 @@
         <ul>
           <li><strong>Match results</strong>, <code>datasets/match_data.csv</code>: historical Australian rugby league fixtures, filtered here to the NRL competition only (1998–2025, 5,435 matches). Sourced from the <a href="https://github.com/uselessnrlstats/uselessnrlstats/tree/main/data/nrl">uselessnrlstats</a> public dataset on GitHub.</li>
           <li><strong>NRL results with venue and region</strong>, <code>datasets/nrldata.csv</code>: supplementary fixture data including kickoff location and state/region, used to validate and enrich the main match dataset. Sourced from <a href="https://www.kaggle.com/datasets/thecruncherau/nrl-results">thecruncherau / NRL Results</a> on Kaggle.</li>
-          <li><strong>Club timeline and metadata</strong>, <code>datasets/teams.csv</code>: founding year, end year, home city, premierships, and brand colour for each NRL/ARL/NSWRFL club active between 1990 and 2025. Compiled from each club's public <a href="https://en.wikipedia.org/wiki/National_Rugby_League">Wikipedia</a> article.</li>
+          <li><strong>Club timeline and metadata</strong>, <code>datasets/teams.csv</code>: founding year, end year, home city, premierships, and brand colour for each NRL/ARL/NSWRFL club active between 1990 and 2025. Compiled from each club's public <a href="https://en.wikipedia.org/wiki/National_Rugby_League">Wikipedia</a> article (home-ground coordinates from each stadium's article where available, falling back to the home city otherwise).</li>
           <li><strong>World coastlines</strong> for the venue map, from <a href="https://github.com/vega/vega-datasets">vega-datasets / world-110m</a>.</li>
         </ul>
         <h4 style="margin-top:1rem;">AI use</h4>
@@ -355,7 +359,8 @@ const charts = [
   ["#chart-bump",       "specs/09-ladder-bump.json"],
   ["#chart-h2h",        "specs/10-head-to-head.json"],
   ["#chart-travel-wr",  "specs/11-travel-vs-winrate.json"],
-  ["#chart-radar",      "specs/12-club-fingerprints.json"]
+  ["#chart-radar",      "specs/12-club-fingerprints.json"],
+  ["#chart-signature",  "specs/13-team-signature.json"]
 ];
 charts.forEach(([sel, url]) => {
   vegaEmbed(sel, url, opts).catch(err => {
