@@ -102,12 +102,17 @@
             ],
             "range": [
               "#006633",
-              "#8a8578"
+              "#4b5460"
             ]
           },
           "title": null,
           "legend": {
-            "orient": "top-right"
+            "orient": "bottom",
+            "direction": "horizontal",
+            "symbolType": "square",
+            "symbolSize": 120,
+            "labelFontSize": 12,
+            "padding": 8
           }
         },
         "tooltip": [

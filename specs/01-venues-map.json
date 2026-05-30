@@ -100,7 +100,7 @@
       ],
       "mark": {
         "type": "circle",
-        "opacity": 0.8,
+        "opacity": 0.55,
         "stroke": "#003d1f",
         "strokeWidth": 1
       },
@@ -118,8 +118,8 @@
           "type": "quantitative",
           "scale": {
             "range": [
-              50,
-              1600
+              40,
+              1100
             ]
           },
           "title": "Home matches",
