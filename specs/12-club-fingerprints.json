@@ -217,7 +217,7 @@
     "height": 170,
     "transform": [
       {
-        "calculate": "[ {axis:'ATK',  v: datum.atk,           maxV: 30,  label: format(datum.atk, '.1f') + ' pts/g'},  {axis:'DEF',  v: datum.def,           maxV: 30,  label: format(datum.def_avg, '.1f') + ' conceded'},  {axis:'FIN',  v: datum.finals_games,  maxV: 60,  label: datum.finals_games + ' finals games'},  {axis:'HOM',  v: datum.home_wr,       maxV: 1,   label: format(datum.home_wr, '.0%') + ' home WR'},  {axis:'AWY',  v: datum.away_wr,       maxV: 1,   label: format(datum.away_wr, '.0%') + ' away WR'} ]",
+        "calculate": "[ {axis:'ATK',  v: datum.atk,           maxV: 30,  value: format(datum.atk, '.1f'),       label: format(datum.atk, '.1f') + ' pts/g'},  {axis:'DEF',  v: datum.def,           maxV: 30,  value: format(datum.def_avg, '.1f'),    label: format(datum.def_avg, '.1f') + ' conceded'},  {axis:'FIN',  v: datum.finals_games,  maxV: 60,  value: '' + datum.finals_games,         label: datum.finals_games + ' finals games'},  {axis:'HOM',  v: datum.home_wr,       maxV: 1,   value: format(datum.home_wr, '.0%'),    label: format(datum.home_wr, '.0%') + ' home WR'},  {axis:'AWY',  v: datum.away_wr,       maxV: 1,   value: format(datum.away_wr, '.0%'),    label: format(datum.away_wr, '.0%') + ' away WR'} ]",
         "as": "axes"
       },
       {
@@ -240,6 +240,10 @@
       {
         "calculate": "datum.axes.label",
         "as": "label"
+      },
+      {
+        "calculate": "datum.axes.value",
+        "as": "value"
       },
       {
         "calculate": "datum.v / datum.maxV",
@@ -322,6 +326,26 @@
               "title": "Value"
             }
           ]
+        }
+      },
+      {
+        "mark": {
+          "type": "text",
+          "align": "left",
+          "baseline": "middle",
+          "dx": 5,
+          "fontSize": 10,
+          "fontWeight": 600,
+          "color": "#14181d"
+        },
+        "encoding": {
+          "x": {
+            "field": "norm",
+            "type": "quantitative"
+          },
+          "text": {
+            "field": "value"
+          }
         }
       }
     ],
