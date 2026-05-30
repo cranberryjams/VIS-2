@@ -133,9 +133,11 @@
           "field": "home_matches",
           "type": "quantitative",
           "scale": {
+            "type": "pow",
+            "exponent": 1.4,
             "range": [
-              40,
-              1100
+              10,
+              2200
             ]
           },
           "title": "Home matches",
