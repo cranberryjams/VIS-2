@@ -224,8 +224,18 @@
     </div>
 
     <h3 class="chart-title"><span class="num-badge">1</span>Where the league is based</h3>
-    <p class="chart-note">Each circle marks a club's home city, sized by total NRL matches played at that ground (1998–2025). The league's centre of gravity is unmistakably <span class="em">Sydney</span>, where eight clubs share the harbour city, with secondary hubs in Brisbane, Newcastle, the Gold Coast, Auckland, and Melbourne. Two zoom panels below the main map detail the league's two densest regions — <span class="em">Queensland</span> and <span class="em">NSW + ACT</span> — with every club labelled by full name.</p>
+    <p class="chart-note">Each circle marks a club's home city, sized by total NRL matches played at that ground (1998–2025). The league's centre of gravity is unmistakably <span class="em">Sydney</span>, where eight clubs share the harbour city, with secondary hubs in Brisbane, Newcastle, the Gold Coast, Auckland, and Melbourne. Two zoom panels below the main map detail the league's two densest regions — <span class="em">Queensland</span> and <span class="em">NSW + ACT</span> — with each club labelled.</p>
     <div class="chart" id="chart-map"></div>
+    <div class="grid-2" style="margin-top: 1rem;">
+      <div>
+        <h4 style="font-family: 'Bebas Neue', sans-serif; letter-spacing: .05em; font-size: 1.1rem; margin: 0 0 .25rem 0; color: var(--ink);">Queensland detail</h4>
+        <div class="chart" id="chart-zoom-qld"></div>
+      </div>
+      <div>
+        <h4 style="font-family: 'Bebas Neue', sans-serif; letter-spacing: .05em; font-size: 1.1rem; margin: 0 0 .25rem 0; color: var(--ink);">NSW + ACT detail</h4>
+        <div class="chart" id="chart-zoom-nsw"></div>
+      </div>
+    </div>
 
     <h3 class="chart-title"><span class="num-badge">2</span>Club lifespans, 1990 – 2025</h3>
     <p class="chart-note">Each bar marks the years a club competed in the top tier of Australian rugby league. The mid-1990s Super League war drove a wave of mergers and exits, with <span class="em">eleven clubs</span> leaving the competition since 1990, while expansion has added Brisbane, Melbourne, the Gold Coast, North Queensland, New Zealand, and most recently the Dolphins. Numbers beside each bar count first-grade premierships won.</p>
@@ -299,7 +309,7 @@
     <div class="grid-2">
       <div>
         <h3 class="chart-title"><span class="num-badge">10</span>Head-to-head matrix</h3>
-        <p class="chart-note">Home win-rate by fixture. Darker = the row team won more often at home against the column opponent.</p>
+        <p class="chart-note">Home win-rate by fixture. Darker = the row team won more often at home against the column opponent. The <span class="em">Dolphins</span> row stands out for the opposite reason — as the league's newest club (joined in 2023, just three seasons of data), they have built up a losing home record against most of the competition.</p>
         <div class="chart" id="chart-h2h"></div>
       </div>
       <div>
@@ -351,6 +361,8 @@
 const opts = { actions: false, renderer: "svg" };
 const charts = [
   ["#chart-map",        "specs/01-venues-map.json"],
+  ["#chart-zoom-qld",   "specs/01-zoom-qld.json"],
+  ["#chart-zoom-nsw",   "specs/01-zoom-nsw.json"],
   ["#chart-lifespan",   "specs/02-club-lifespans.json"],
   ["#chart-points",     "specs/03-points-per-match.json"],
   ["#chart-homeaway",   "specs/04-home-vs-away.json"],

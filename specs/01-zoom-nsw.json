@@ -1,0 +1,130 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "NSW + ACT detail panel for chart 1: zoomed mercator over Newcastle-to-Canberra covering the league's densest cluster of clubs. Circles sized by NRL home matches, club name labelled where space allows.",
+  "width": 460,
+  "height": 360,
+  "projection": {
+    "type": "mercator",
+    "center": [150.5, -33.9],
+    "scale": 5200
+  },
+  "layer": [
+    {
+      "data": {
+        "url": "https://vega.github.io/vega-datasets/data/world-110m.json",
+        "format": { "type": "topojson", "feature": "countries" }
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#efe9dc",
+        "stroke": "#cfc6b1",
+        "strokeWidth": 0.7
+      }
+    },
+    {
+      "data": {
+        "url": "datasets/match_data.csv",
+        "format": {
+          "type": "csv",
+          "parse": {
+            "date": "date",
+            "home_team_score": "number",
+            "away_team_score": "number"
+          }
+        }
+      },
+      "transform": [
+        { "filter": "datum.competition == 'NRL'" },
+        {
+          "calculate": "datum.home_team == 'Penrith Panthers' ? 'Panthers' :datum.home_team == 'Parramatta Eels' ? 'Eels' :datum.home_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.home_team == 'Sydney Roosters' || datum.home_team == 'Sydney City Roosters') ? 'Roosters' :datum.home_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.home_team == 'Canberra Raiders' ? 'Raiders' :datum.home_team == 'Newcastle Knights' ? 'Knights' :datum.home_team == 'St George Illawarra Dragons' ? 'Dragons' :(datum.home_team == 'Canterbury Bankstown Bulldogs' || datum.home_team == 'Bulldogs') ? 'Bulldogs' :(datum.home_team == 'Cronulla Sutherland Sharks' || datum.home_team == 'Sharks') ? 'Sharks' :datum.home_team == 'Wests Tigers' ? 'Wests Tigers' : 'Other'",
+          "as": "home"
+        },
+        { "filter": "datum.home != 'Other'" },
+        {
+          "aggregate": [{ "op": "count", "as": "home_matches" }],
+          "groupby": ["home"]
+        },
+        {
+          "lookup": "home",
+          "from": {
+            "data": {
+              "url": "datasets/teams.csv",
+              "format": {
+                "type": "csv",
+                "parse": { "home_lat": "number", "home_lon": "number" }
+              }
+            },
+            "key": "team",
+            "fields": ["home_lat", "home_lon", "home_city", "home_region", "full_name"]
+          }
+        },
+        { "filter": "datum.home_lat != null" }
+      ],
+      "layer": [
+        {
+          "mark": {
+            "type": "circle",
+            "opacity": 0.55,
+            "stroke": "#003d1f",
+            "strokeWidth": 1
+          },
+          "encoding": {
+            "longitude": { "field": "home_lon", "type": "quantitative" },
+            "latitude": { "field": "home_lat", "type": "quantitative" },
+            "size": {
+              "field": "home_matches",
+              "type": "quantitative",
+              "scale": { "type": "pow", "exponent": 1.4, "range": [40, 1600] },
+              "legend": null
+            },
+            "color": {
+              "field": "home_region",
+              "type": "nominal",
+              "scale": {
+                "domain": ["NSW", "QLD", "VIC", "ACT", "NZ", "SA", "WA"],
+                "range": ["#006633", "#c8a14a", "#582C83", "#1B7B7A", "#0F4C81", "#E55B13", "#A30000"]
+              },
+              "legend": null
+            },
+            "tooltip": [
+              { "field": "full_name", "title": "Club" },
+              { "field": "home_city", "title": "Home city" },
+              { "field": "home_matches", "title": "Home matches" }
+            ]
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "dy": -14,
+            "fontWeight": 700,
+            "fontSize": 10,
+            "color": "#fbf8f3",
+            "stroke": "#fbf8f3",
+            "strokeWidth": 3,
+            "strokeOpacity": 0.95
+          },
+          "encoding": {
+            "longitude": { "field": "home_lon", "type": "quantitative" },
+            "latitude": { "field": "home_lat", "type": "quantitative" },
+            "text": { "field": "home" }
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "dy": -14,
+            "fontWeight": 700,
+            "fontSize": 10,
+            "color": "#14181d"
+          },
+          "encoding": {
+            "longitude": { "field": "home_lon", "type": "quantitative" },
+            "latitude": { "field": "home_lat", "type": "quantitative" },
+            "text": { "field": "home" }
+          }
+        }
+      ]
+    }
+  ]
+}

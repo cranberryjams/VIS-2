@@ -1,0 +1,130 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Queensland detail panel for chart 1: zoomed mercator over Townsville-to-Gold Coast covering the four QLD clubs (Cowboys, Broncos, Dolphins, Titans). Circles sized by NRL home matches, club name labelled.",
+  "width": 460,
+  "height": 360,
+  "projection": {
+    "type": "mercator",
+    "center": [149, -24],
+    "scale": 1700
+  },
+  "layer": [
+    {
+      "data": {
+        "url": "https://vega.github.io/vega-datasets/data/world-110m.json",
+        "format": { "type": "topojson", "feature": "countries" }
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#efe9dc",
+        "stroke": "#cfc6b1",
+        "strokeWidth": 0.7
+      }
+    },
+    {
+      "data": {
+        "url": "datasets/match_data.csv",
+        "format": {
+          "type": "csv",
+          "parse": {
+            "date": "date",
+            "home_team_score": "number",
+            "away_team_score": "number"
+          }
+        }
+      },
+      "transform": [
+        { "filter": "datum.competition == 'NRL'" },
+        {
+          "calculate": "datum.home_team == 'Brisbane Broncos' ? 'Broncos' :datum.home_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.home_team == 'Gold Coast Titans' ? 'Titans' :datum.home_team == 'Dolphins' ? 'Dolphins' :datum.home_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' : 'Other'",
+          "as": "home"
+        },
+        { "filter": "datum.home != 'Other'" },
+        {
+          "aggregate": [{ "op": "count", "as": "home_matches" }],
+          "groupby": ["home"]
+        },
+        {
+          "lookup": "home",
+          "from": {
+            "data": {
+              "url": "datasets/teams.csv",
+              "format": {
+                "type": "csv",
+                "parse": { "home_lat": "number", "home_lon": "number" }
+              }
+            },
+            "key": "team",
+            "fields": ["home_lat", "home_lon", "home_city", "home_region", "full_name"]
+          }
+        },
+        { "filter": "datum.home_lat != null" }
+      ],
+      "layer": [
+        {
+          "mark": {
+            "type": "circle",
+            "opacity": 0.6,
+            "stroke": "#003d1f",
+            "strokeWidth": 1
+          },
+          "encoding": {
+            "longitude": { "field": "home_lon", "type": "quantitative" },
+            "latitude": { "field": "home_lat", "type": "quantitative" },
+            "size": {
+              "field": "home_matches",
+              "type": "quantitative",
+              "scale": { "type": "pow", "exponent": 1.4, "range": [40, 1600] },
+              "legend": null
+            },
+            "color": {
+              "field": "home_region",
+              "type": "nominal",
+              "scale": {
+                "domain": ["NSW", "QLD", "VIC", "ACT", "NZ", "SA", "WA"],
+                "range": ["#006633", "#c8a14a", "#582C83", "#1B7B7A", "#0F4C81", "#E55B13", "#A30000"]
+              },
+              "legend": null
+            },
+            "tooltip": [
+              { "field": "full_name", "title": "Club" },
+              { "field": "home_city", "title": "Home city" },
+              { "field": "home_matches", "title": "Home matches" }
+            ]
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "dy": -18,
+            "fontWeight": 700,
+            "fontSize": 11,
+            "color": "#fbf8f3",
+            "stroke": "#fbf8f3",
+            "strokeWidth": 3,
+            "strokeOpacity": 0.95
+          },
+          "encoding": {
+            "longitude": { "field": "home_lon", "type": "quantitative" },
+            "latitude": { "field": "home_lat", "type": "quantitative" },
+            "text": { "field": "full_name" }
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "dy": -18,
+            "fontWeight": 700,
+            "fontSize": 11,
+            "color": "#14181d"
+          },
+          "encoding": {
+            "longitude": { "field": "home_lon", "type": "quantitative" },
+            "latitude": { "field": "home_lat", "type": "quantitative" },
+            "text": { "field": "full_name" }
+          }
+        }
+      ]
+    }
+  ]
+}
