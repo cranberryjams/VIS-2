@@ -258,10 +258,11 @@
         "dy": -22,
         "fontWeight": 700,
         "fontSize": 11,
-        "color": "#14181d",
+        "fill": "#14181d",
         "stroke": "#fbf8f3",
         "strokeWidth": 3,
-        "strokeOpacity": 0.9
+        "strokeOpacity": 0.9,
+        "paintOrder": "stroke"
       },
       "encoding": {
         "longitude": {
