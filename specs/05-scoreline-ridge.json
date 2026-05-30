@@ -67,22 +67,24 @@
       ],
       "scale": {
         "range": [
-          "#c8a14a",
-          "#a89a3f",
-          "#7d9b3a",
-          "#4d8540",
-          "#1d6e38",
+          "#e8b94e",
+          "#c25a2d",
+          "#8b2d3a",
+          "#4a4a8a",
+          "#2a8a5a",
           "#003d1f"
         ]
       },
       "title": "Era",
       "legend": {
         "orient": "right",
-        "labelFontSize": 12,
-        "titleFontSize": 12,
+        "labelFontSize": 15,
+        "titleFontSize": 15,
         "symbolType": "stroke",
-        "symbolStrokeWidth": 4,
-        "rowPadding": 6
+        "symbolStrokeWidth": 5,
+        "symbolSize": 260,
+        "rowPadding": 12,
+        "padding": 10
       }
     },
     "tooltip": [
