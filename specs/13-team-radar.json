@@ -1,8 +1,8 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Radar / spider chart overlaying the four highest win-rate currently-active NRL clubs across five performance metrics (attack, defence, finals games played, home win-rate, away win-rate). Custom-built: polygon vertices are derived in-spec by converting normalised metric values to (x, y) via sin / cos with a PI/5 angle step, then drawn with line marks using linear-closed interpolation. Reference grid is four hand-rendered concentric pentagonal rings plus five radial spokes.",
-  "width": 480,
-  "height": 520,
+  "width": 720,
+  "height": 640,
   "config": {
     "view": { "stroke": null }
   },
