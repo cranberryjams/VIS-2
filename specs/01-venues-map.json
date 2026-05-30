@@ -253,30 +253,39 @@
           "filter": "indexof(['Sydney','Brisbane','Newcastle','Melbourne','Auckland','Canberra','Gold Coast','Townsville'], datum.metro) >= 0"
         }
       ],
-      "mark": {
-        "type": "text",
-        "dy": -22,
-        "fontWeight": 700,
-        "fontSize": 11,
-        "fill": "#14181d",
-        "stroke": "#fbf8f3",
-        "strokeWidth": 3,
-        "strokeOpacity": 0.9,
-        "paintOrder": "stroke"
-      },
-      "encoding": {
-        "longitude": {
-          "field": "label_lon",
-          "type": "quantitative"
+      "layer": [
+        {
+          "mark": {
+            "type": "text",
+            "dy": -22,
+            "fontWeight": 700,
+            "fontSize": 11,
+            "color": "#fbf8f3",
+            "stroke": "#fbf8f3",
+            "strokeWidth": 4,
+            "strokeOpacity": 0.95
+          },
+          "encoding": {
+            "longitude": { "field": "label_lon", "type": "quantitative" },
+            "latitude": { "field": "label_lat", "type": "quantitative" },
+            "text": { "field": "metro" }
+          }
         },
-        "latitude": {
-          "field": "label_lat",
-          "type": "quantitative"
-        },
-        "text": {
-          "field": "metro"
+        {
+          "mark": {
+            "type": "text",
+            "dy": -22,
+            "fontWeight": 700,
+            "fontSize": 11,
+            "color": "#14181d"
+          },
+          "encoding": {
+            "longitude": { "field": "label_lon", "type": "quantitative" },
+            "latitude": { "field": "label_lat", "type": "quantitative" },
+            "text": { "field": "metro" }
+          }
         }
-      }
+      ]
     }
   ]
 }
