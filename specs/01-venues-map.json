@@ -197,25 +197,6 @@
           "as": "home"
         },
         {
-          "calculate": "datum.away_team == 'Brisbane Broncos' ? 'Broncos' :datum.away_team == 'Melbourne Storm' ? 'Storm' :datum.away_team == 'Penrith Panthers' ? 'Panthers' :datum.away_team == 'Parramatta Eels' ? 'Eels' :datum.away_team == 'South Sydney Rabbitohs' ? 'Rabbitohs' :(datum.away_team == 'Sydney Roosters' || datum.away_team == 'Sydney City Roosters') ? 'Roosters' :datum.away_team == 'Manly Warringah Sea Eagles' ? 'Sea Eagles' :datum.away_team == 'Canberra Raiders' ? 'Raiders' :datum.away_team == 'Newcastle Knights' ? 'Knights' :datum.away_team == 'North Queensland Cowboys' ? 'Cowboys' :datum.away_team == 'St George Illawarra Dragons' ? 'Dragons' :datum.away_team == 'St George Dragons' ? 'St George' :datum.away_team == 'Illawarra Steelers' ? 'Illawarra' :(datum.away_team == 'Canterbury Bankstown Bulldogs' || datum.away_team == 'Bulldogs') ? 'Bulldogs' :(datum.away_team == 'Cronulla Sutherland Sharks' || datum.away_team == 'Sharks') ? 'Sharks' :datum.away_team == 'Wests Tigers' ? 'Wests Tigers' :datum.away_team == 'Western Suburbs Magpies' ? 'Western Suburbs' :datum.away_team == 'Balmain Tigers' ? 'Balmain' :(datum.away_team == 'Auckland Warriors' || datum.away_team == 'New Zealand Warriors' || datum.away_team == 'Warriors') ? 'Warriors' :datum.away_team == 'Gold Coast Chargers' ? 'Gold Coast Chargers' :datum.away_team == 'Gold Coast Titans' ? 'Titans' :datum.away_team == 'Dolphins' ? 'Dolphins' :datum.away_team == 'North Sydney Bears' ? 'North Sydney' :datum.away_team == 'Adelaide Rams' ? 'Adelaide Rams' :datum.away_team == 'Northern Eagles' ? 'Northern Eagles' :datum.away_team",
-          "as": "away"
-        },
-        {
-          "calculate": "year(datum.date)",
-          "as": "season"
-        },
-        {
-          "aggregate": [
-            {
-              "op": "count",
-              "as": "home_matches"
-            }
-          ],
-          "groupby": [
-            "home"
-          ]
-        },
-        {
           "lookup": "home",
           "from": {
             "data": {
@@ -241,27 +222,58 @@
           }
         },
         {
-          "filter": "datum.home_lat != null && datum.home_matches >= 100"
+          "filter": "datum.home_lat != null"
+        },
+        {
+          "calculate": "indexof(['Penrith','Parramatta'], datum.home_city) >= 0 ? 'Sydney' : datum.home_city",
+          "as": "metro"
+        },
+        {
+          "aggregate": [
+            {
+              "op": "count",
+              "as": "home_matches"
+            },
+            {
+              "op": "mean",
+              "field": "home_lat",
+              "as": "label_lat"
+            },
+            {
+              "op": "mean",
+              "field": "home_lon",
+              "as": "label_lon"
+            }
+          ],
+          "groupby": [
+            "metro"
+          ]
+        },
+        {
+          "filter": "indexof(['Sydney','Brisbane','Newcastle','Melbourne','Auckland','Canberra','Gold Coast','Townsville'], datum.metro) >= 0"
         }
       ],
       "mark": {
         "type": "text",
-        "dy": -16,
-        "fontWeight": 600,
+        "dy": -22,
+        "fontWeight": 700,
         "fontSize": 11,
-        "color": "#14181d"
+        "color": "#14181d",
+        "stroke": "#fbf8f3",
+        "strokeWidth": 3,
+        "strokeOpacity": 0.9
       },
       "encoding": {
         "longitude": {
-          "field": "home_lon",
+          "field": "label_lon",
           "type": "quantitative"
         },
         "latitude": {
-          "field": "home_lat",
+          "field": "label_lat",
           "type": "quantitative"
         },
         "text": {
-          "field": "home_city"
+          "field": "metro"
         }
       }
     }
