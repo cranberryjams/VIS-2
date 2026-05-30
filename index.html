@@ -191,11 +191,13 @@
     <div class="section-head">
       <span class="num">PART ONE</span>
       <h2>The Game and Its Grounds</h2>
-      <p class="lede">From the chaos of the 1990s Super League war to a continent-spanning competition in 2025, the NRL has grown into Australia's most-watched winter sport.</p>
+      <p class="lede">NRL was given birth from a a clash between two rival leagues in the 1990s and has evolved to a continent-spanning competition in the modern day. Now, the NRL has grown into Australia's most-watched winter sport 
+        and contains one of the highest rated television series, the "State of Origin".</p>
     </div>
 
     <div class="narrative">
-      <p>Rugby league has been played in Australia since 1908, but the modern era we see today is a national, popular, widely broadcasted competition, built over the last thirty-five years. In 1990 the New South Wales Rugby League fielded sixteen mostly-Sydney clubs. In 1998 the NRL was born from the wreckage of the Super League war. By 2025 the league runs seventeen teams across three Australian states, the ACT and New Zealand, with the Dolphins as its newest entry.</p>
+      <p>Rugby league has been played in Australia since 1908, but the modern era we see today is a national, popular, widely broadcasted competition, built over the last thirty-five years. In 1990 the New South Wales Rugby League fielded
+         sixteen mostly-Sydney clubs. In 1998 the NRL was born from the wreckage of the Super League war. By 2025 the league runs seventeen teams across three Australian states, the ACT and New Zealand, with the Dolphins as its newest entry.</p>
     </div>
 
     <div class="hero-stats">
@@ -311,9 +313,9 @@
     <p class="chart-note">Five metrics for the <span class="em">eight strongest currently-active clubs</span> by overall win-rate (1998–2025): attack (avg points scored), defence (avg points conceded, inverted so longer = better), finals games played, home win-rate, and away win-rate.</p>
     <div class="chart" id="chart-radar"></div>
 
-    <h3 class="chart-title"><span class="num-badge">13</span>A team's signature, 1998 – 2024</h3>
-    <p class="chart-note">Each line traces one club's <span class="em">style trajectory</span>: every season is a point at (average points scored, average points conceded), connected season by season. The dashed crosshairs mark the league average and split the chart into four style quadrants. The <span class="em">Storm</span> live almost entirely in the strong-defence half. The <span class="em">Panthers</span> march steadily into the elite top-right corner across the modern dynasty. The <span class="em">Bulldogs</span> drift down and left. The <span class="em">Broncos</span> swing across the strong-attack region across the era. The other thirteen clubs sit as grey context lines.</p>
-    <div class="chart" id="chart-signature"></div>
+    <h3 class="chart-title"><span class="num-badge">13</span>Top four overlaid</h3>
+    <p class="chart-note">A spider chart overlaying the <span class="em">four highest win-rate currently-active clubs</span> — Storm, Roosters, Broncos, and Panthers — across the same five metrics as the fingerprints above. Where chart 12 lets you scan eight clubs in parallel, this lets you compare shape directly: the <span class="em">Storm</span>'s polygon stretches widest on the defence axis, the <span class="em">Panthers</span> push furthest into finals games, and all four clubs read as roughly the same size on attack — the title-winning differences live in defence and post-season experience.</p>
+    <div class="chart" id="chart-radar2"></div>
 
   </section>
 
@@ -360,7 +362,7 @@ const charts = [
   ["#chart-h2h",        "specs/10-head-to-head.json"],
   ["#chart-travel-wr",  "specs/11-travel-vs-winrate.json"],
   ["#chart-radar",      "specs/12-club-fingerprints.json"],
-  ["#chart-signature",  "specs/13-team-signature.json"]
+  ["#chart-radar2",     "specs/13-team-radar.json"]
 ];
 charts.forEach(([sel, url]) => {
   vegaEmbed(sel, url, opts).catch(err => {
