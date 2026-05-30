@@ -140,7 +140,8 @@
           },
           "title": "Home matches",
           "legend": {
-            "orient": "top-right"
+            "orient": "right",
+            "offset": 12
           }
         },
         "color": {
@@ -168,7 +169,8 @@
             ]
           },
           "legend": {
-            "orient": "top-right"
+            "orient": "right",
+            "offset": 12
           }
         },
         "tooltip": [
